@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>恐龍大冒險：FPS 解鎖版</title>
+    <title>恐龍大冒險：FPS 解鎖版 | 邱宸AI模型</title>
     <style>
         /* --- CSS 變數系統 (支援深色模式) --- */
         :root {
@@ -53,7 +53,7 @@
             text-shadow: 1px 1px 0 #000;
         }
 
-        /* --- 系統通知 (Toast) --- */
+        /* 系統通知 (Toast) */
         #systemNotification {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
             background: rgba(50, 50, 50, 0.95); color: white; padding: 15px 25px;
@@ -74,30 +74,16 @@
         }
         .fake-auth-modal.active { opacity: 1; pointer-events: auto; }
 
-        /* Google Style */
         .google-card { background: white; width: 400px; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); text-align: center; color: #202124; font-family: 'Roboto', sans-serif; }
-        .google-logo { width: 75px; margin-bottom: 10px; }
-        .g-input { width: 100%; padding: 13px 15px; margin: 20px 0; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; box-sizing: border-box; }
-        .g-btn { background: #1a73e8; color: white; font-weight: bold; padding: 10px 24px; border-radius: 4px; border: none; cursor: pointer; float: right; }
-
-        /* Facebook Style */
         .fb-card { background: #f0f2f5; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; padding-top: 100px; }
-        .fb-logo { color: #1877f2; font-size: 40px; font-weight: bold; margin-bottom: 20px; font-family: Helvetica, Arial, sans-serif; }
         .fb-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 350px; text-align: center; }
-        .fb-input { width: 100%; padding: 14px 16px; margin-bottom: 12px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 17px; box-sizing: border-box; }
-        .fb-btn { width: 100%; background: #1877f2; color: white; font-size: 20px; font-weight: bold; padding: 10px; border: none; border-radius: 6px; cursor: pointer; }
-
-        /* Apple Style */
         .apple-card { background: white; width: 400px; padding: 30px; border-radius: 12px; text-align: center; color: #333; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
         [data-theme="dark"] .apple-card { background: #222; color: white; }
-        .apple-logo { font-size: 40px; margin-bottom: 10px; }
-        .apple-btn { background: #000; color: white; width: 100%; padding: 15px; border-radius: 8px; border: none; font-size: 17px; cursor: pointer; margin-top: 20px; }
-        [data-theme="dark"] .apple-btn { background: white; color: black; }
 
         /* 啟動畫面 */
         #splashScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--card-bg); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 1; transition: opacity 0.8s ease-out; }
         #splashScreen.fade-out { opacity: 0; pointer-events: none; }
-        .splash-logo { max-width: 80%; max-height: 80%; animation: logoEntrance 1s ease-out; }
+        .splash-logo { max-width: 80%; max-height: 80%; animation: logoEntrance 1s ease-out; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);}
         @keyframes logoEntrance { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         #gameCanvas { display: block; width: 100%; height: 100%; }
@@ -127,10 +113,6 @@
         .btn-google { background: #fff; color: #757575; border-color: #dadce0; }
         .btn-fb { background: #1877f2; color: white; border: none; }
         .btn-apple { background: #000; color: white; border: none; }
-        [data-theme="dark"] .btn-apple { background: #fff; color: #000; }
-        .divider { display: flex; align-items: center; text-align: center; margin: 15px 0; color: #a0aec0; font-size: 0.9rem; }
-        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--btn-border); }
-        .input-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--input-bg); color: var(--text-color); margin-bottom: 10px; box-sizing: border-box; font-size: 16px; }
         .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--btn-border); }
         .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -147,33 +129,22 @@
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(56, 161, 105, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(56, 161, 105, 0); } 100% { box-shadow: 0 0 0 0 rgba(56, 161, 105, 0); } }
         .hidden { opacity: 0 !important; pointer-events: none !important; z-index: -1 !important; }
         .ai-model-btn { border-color: #d6bcfa; }
-        .ai-model-btn:hover { border-color: #9f7aea; color: #6b46c1; background: #faf5ff; }
-        [data-theme="dark"] .ai-model-btn:hover { background: #44337a; color: #d6bcfa; }
         .ai-model-btn .tag { font-size: 12px; padding: 2px 8px; border-radius: 10px; background: #edf2f7; color: #718096; }
     </style>
 </head>
 <body>
 
-    <!-- FPS Counter -->
     <div id="fpsCounter">FPS: 60</div>
-
-    <!-- 系統通知 (Toast) -->
-    <div id="systemNotification">
-        <span class="notif-icon">💬</span>
-        <span id="notifMessage">通知訊息</span>
-    </div>
-
-    <!-- 啟動畫面 -->
+    <div id="systemNotification"><span class="notif-icon">💬</span><span id="notifMessage">通知訊息</span></div>
+    
+    <!-- 啟動畫面: 修正 Logo 路徑為 channels4_profile.jpg (符合常見檔名) -->
     <div id="splashScreen">
-        <!-- Placeholder for image: A dinosaur logo -->
-        <img src="https://yt3.googleusercontent.com/49l8URXwr3VSDoDpfavQ_jOU9SjWJyiy48sMd7hy5j_DR6bzzr_baDUlrIQRSIgFvT8wIxspxA=s160-c-k-c0x00ffffff-no-rj" alt="邱宸 Chiu Chen" class="splash-logo">
+        <img src="channels4_profile.jpg" alt="邱宸 Chiu Chen" class="splash-logo" onerror="this.src='https://via.placeholder.com/200?text=Dino+Adventure'">
     </div>
 
-    <!-- 遊戲畫布 -->
     <canvas id="gameCanvas"></canvas>
     <div id="aiRespawnMsg">AI 自動復活中... 🔄</div>
 
-    <!-- 遊戲 UI 介面 -->
     <div class="ui-overlay">
         <div class="hud">
             <div class="top-bar">
@@ -193,7 +164,6 @@
         </div>
     </div>
 
-    <!-- 開始選單 -->
     <div id="menuModal" class="modal hidden">
         <div class="modal-content">
             <h1 id="menuTitle">恐龍大冒險 🦖</h1>
@@ -209,699 +179,207 @@
         </div>
     </div>
 
-    <!-- AI 模型選擇 -->
     <div id="aiModal" class="modal hidden">
         <div class="modal-content">
             <h2 data-i18n="chooseAI">選擇 AI 運算模型 🧠</h2>
             <p data-i18n="aiDesc">選擇越高級的模型，閃避運算越精準。</p>
             <div class="btn-list">
-                <button class="list-btn ai-model-btn" onclick="selectAiModel('Chiu-Chen 1', 1.0)">Chiu-Chen 1 <span class="tag">Basic</span></button>
-                <button class="list-btn ai-model-btn" onclick="selectAiModel('Chiu-Chen 2', 1.1)">Chiu-Chen 2 <span class="tag">Adv</span></button>
-                <button class="list-btn ai-model-btn" onclick="selectAiModel('Chiu-Chen 2-Max', 1.2)">Chiu-Chen 2-Max <span class="tag">Plus</span></button>
-                <button class="list-btn ai-model-btn" onclick="selectAiModel('Chiu-Chen 3', 1.3)">Chiu-Chen 3 <span class="tag">Next</span></button>
-                <button class="list-btn ai-model-btn" onclick="selectAiModel('Chiu-Chen 3 Pro', 1.4)">Chiu-Chen 3 Pro <span class="tag">Pro</span></button>
-                <button class="list-btn ai-model-btn" onclick="selectAiModel('Chiu-Chen 3Max', 1.5)">Chiu-Chen 3Max <span class="tag">Ultra</span></button>
-                <button class="list-btn ai-model-btn" onclick="selectAiModel('Chiu-Chen 3 Pro Max', 1.6)" style="border-color: #d53f8c; color: #d53f8c; font-weight:bold;">Chiu-Chen 3 Pro Max <span class="tag" style="background:#fed7e2; color:#d53f8c;">MAX</span></button>
+                <button class="list-btn ai-model-btn" data-ai="Chiu-Chen 1" data-mult="1.0">Chiu-Chen 1 <span class="tag">Basic</span></button>
+                <button class="list-btn ai-model-btn" data-ai="Chiu-Chen 2" data-mult="1.1">Chiu-Chen 2 <span class="tag">Adv</span></button>
+                <button class="list-btn ai-model-btn" data-ai="Chiu-Chen 2-Max" data-mult="1.2">Chiu-Chen 2-Max <span class="tag">Plus</span></button>
+                <button class="list-btn ai-model-btn" data-ai="Chiu-Chen 3" data-mult="1.3">Chiu-Chen 3 <span class="tag">Next</span></button>
+                <button class="list-btn ai-model-btn" data-ai="Chiu-Chen 3 Pro" data-mult="1.4">Chiu-Chen 3 Pro <span class="tag">Pro</span></button>
+                <button class="list-btn ai-model-btn" data-ai="Chiu-Chen 3Max" data-mult="1.5">Chiu-Chen 3Max <span class="tag">Ultra</span></button>
+                <button class="list-btn ai-model-btn" data-ai="Chiu-Chen 3 Pro Max" data-mult="1.6" style="border-color: #d53f8c; color: #d53f8c; font-weight:bold;">Chiu-Chen 3 Pro Max <span class="tag" style="background:#fed7e2; color:#d53f8c;">MAX</span></button>
             </div>
-            <button class="cancel-btn" onclick="cancelAiMenu()" style="background:none; border:none; text-decoration:underline; cursor:pointer; color:inherit;" data-i18n="cancel">取消 / 關閉 AI</button>
+            <button class="cancel-btn" onclick="cancelAiMenu()" style="background:none; border:none; text-decoration:underline; cursor:pointer; color:inherit; margin-top:15px;" data-i18n="cancel">取消 / 關閉 AI</button>
         </div>
     </div>
 
-    <!-- 設定 Modal -->
     <div id="settingsModal" class="modal hidden">
         <div class="modal-content">
             <span class="close-modal" onclick="closeSettings()">×</span>
             <h2 data-i18n="settings">設定</h2>
-
             <div id="authSection">
                 <div id="guestView">
                     <p data-i18n="guestMsg">您目前是訪客身份，分數僅保存在本機。</p>
-                    <button class="auth-btn btn-google" onclick="openFakeAuth('google')">
-                        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.715H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.159 6.656 3.58 9 3.58z"/></svg>
-                        Login with Google
-                    </button>
-                    <button class="auth-btn btn-fb" onclick="openFakeAuth('facebook')">
-                        <span style="font-weight:900; font-family:sans-serif;">f</span> Login with Facebook
-                    </button>
-                    <button class="auth-btn btn-apple" onclick="openFakeAuth('apple')">
-                         Login with Apple
-                    </button>
-                    
+                    <button class="auth-btn btn-google" onclick="openFakeAuth('google')">🔐 Google 登入</button>
+                    <button class="auth-btn btn-fb" onclick="openFakeAuth('facebook')">📘 Facebook 登入</button>
+                    <button class="auth-btn btn-apple" onclick="openFakeAuth('apple')"> Apple 登入</button>
                     <div class="divider" data-i18n="or">或</div>
                     <input type="email" class="input-field" placeholder="Email / Phone" id="loginInput">
                     <button class="auth-btn" style="background:var(--accent-color); color:white; border:none;" onclick="triggerEmailLogin()" data-i18n="sendCode">發送驗證碼</button>
                 </div>
-
                 <div id="otpView" class="hidden">
-                    <p id="otpInstructions" data-i18n="otpMsg">請輸入發送到您裝置的驗證碼：</p>
+                    <p id="otpInstructions" data-i18n="otpMsg">請輸入驗證碼：</p>
                     <div class="otp-container">
-                        <input type="text" class="otp-input" maxlength="1" onkeyup="moveFocus(this, 1)">
-                        <input type="text" class="otp-input" maxlength="1" onkeyup="moveFocus(this, 2)">
-                        <input type="text" class="otp-input" maxlength="1" onkeyup="moveFocus(this, 3)">
-                        <input type="text" class="otp-input" maxlength="1" onkeyup="verifyOtp()">
+                        <input type="text" class="otp-input" maxlength="1"> <input type="text" class="otp-input" maxlength="1">
+                        <input type="text" class="otp-input" maxlength="1"> <input type="text" class="otp-input" maxlength="1">
                     </div>
                 </div>
-
                 <div id="userView" class="hidden">
-                    <div class="user-profile">
-                        <div class="avatar" id="userAvatar">U</div>
-                        <h3 id="userName">User</h3>
-                        <p style="margin:0; font-size:14px; color:#718096;" data-i18n="synced">雲端同步已開啟 ✅</p>
-                    </div>
-                    <button class="auth-btn" onclick="logout()" style="color:#e53e3e; border-color:#e53e3e; background:transparent;" data-i18n="logout">登出</button>
+                    <div class="user-profile"><div class="avatar" id="userAvatar">U</div><h3 id="userName">User</h3><p style="font-size:14px;" data-i18n="synced">雲端同步已開啟 ✅</p></div>
+                    <button class="auth-btn" onclick="logout()" style="color:#e53e3e; border-color:#e53e3e;" data-i18n="logout">登出</button>
                 </div>
             </div>
             <div class="divider"></div>
-            
-            <!-- 1. FPS Toggle -->
-            <div class="settings-row">
-                <span data-i18n="showFPS">顯示 FPS (Real-time)</span>
-                <label class="switch"><input type="checkbox" id="fpsToggle"><span class="slider"></span></label>
-            </div>
-            
-            <!-- 2. V-Sync Toggle -->
-            <div class="settings-row">
-                <span data-i18n="disableVSync">關閉垂直同步 (V-Sync)</span>
-                <label class="switch"><input type="checkbox" id="vSyncToggle"><span class="slider"></span></label>
-            </div>
-
-            <div class="settings-row">
-                <span data-i18n="darkMode">深色模式</span>
-                <label class="switch"><input type="checkbox" id="darkModeToggle"><span class="slider"></span></label>
-            </div>
-            <div class="settings-row">
-                <span data-i18n="language">語言 (Language)</span>
-                <button id="langToggle" class="btn" style="padding:5px 10px; font-size:14px;" onclick="toggleLanguage()">English</button>
-            </div>
+            <div class="settings-row"><span data-i18n="showFPS">顯示 FPS</span><label class="switch"><input type="checkbox" id="fpsToggle"><span class="slider"></span></label></div>
+            <div class="settings-row"><span data-i18n="disableVSync">關閉垂直同步 (解鎖FPS)</span><label class="switch"><input type="checkbox" id="vSyncToggle"><span class="slider"></span></label></div>
+            <div class="settings-row"><span data-i18n="darkMode">深色模式</span><label class="switch"><input type="checkbox" id="darkModeToggle"><span class="slider"></span></label></div>
+            <div class="settings-row"><span data-i18n="language">語言</span><button id="langToggle" class="btn" style="padding:5px 10px;" onclick="toggleLanguage()">English</button></div>
         </div>
     </div>
 
-    <!-- --- 偽裝登入介面 (Hidden by default) --- -->
-    <!-- Google Mock -->
-    <div id="googleModal" class="fake-auth-modal">
-        <div class="google-card">
-            <svg class="google-logo" viewBox="0 0 272 92" width="75" height="24">
-                <path fill="#EA4335" d="M115.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C71.25 34.32 81.25 25 93.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44S80.99 39.2 80.99 47.18c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z"/>
-                <path fill="#FBBC05" d="M163.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18c0-12.85 10.01-22.18 22.25-22.18s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44s-12.51 5.46-12.51 13.44c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z"/>
-                <path fill="#4285F4" d="M209.75 26.34v39.82c0 16.38-9.66 23.07-21.08 23.07-10.75 0-17.22-7.19-19.71-13.18l8.42-3.51c1.56 3.74 5.34 8.06 11.29 8.06 7.32 0 11.84-4.51 11.84-13v-3.19h-.34c-2.18 2.69-6.38 5.04-12.09 5.04-11.25 0-21.5-9.66-21.5-22.26 0-12.52 10.25-22.26 21.5-22.26 5.71 0 9.91 2.43 12.09 5.12h.34v-3.61h9.24zm-8.56 20.92c0-7.81-5.21-13.52-11.84-13.52-6.72 0-12.35 5.71-12.35 13.52 0 7.73 5.63 13.36 12.35 13.36 6.63 0 11.84-5.63 11.84-13.36z"/>
-                <path fill="#34A853" d="M225 26.34h9.24v40.5H225z"/>
-                <path fill="#EA4335" d="M262.02 54.48l7.56 5.04c-2.44 3.61-8.32 9.83-18.48 9.83-12.6 0-22.01-9.74-22.01-22.18 0-13.19 9.49-22.18 20.92-22.18 11.51 0 17.14 9.16 18.99 14.11l1.01 2.52-29.65 12.28c2.27 4.45 5.8 6.72 10.75 6.72 4.96 0 8.4-2.44 10.91-6.14zm-23.27-7.98l19.82-8.23c-1.09-2.77-4.37-4.7-8.23-4.7-4.95 0-11.84 4.37-11.59 12.93z"/>
-                <path fill="#4285F4" d="M35.29 41.41V32H67c.31 1.64.47 3.58.47 5.68 0 7.06-1.93 15.79-8.15 22.01-6.05 6.3-13.78 9.66-24.02 9.66C16.32 69.35.5 53.52.5 34s15.82-35.35 34.8-35.35c10.5 0 17.98 4.12 23.6 9.49l-6.64 6.64c-4.03-3.78-9.49-6.72-16.97-6.72-13.86 0-24.7 11.17-24.7 25.03 0 13.86 10.84 25.03 24.7 25.03 8.99 0 14.11-3.61 17.39-6.89 2.66-2.66 4.41-6.46 5.1-11.65l-19.29.01z"/>
-            </svg>
-            <h2>Sign in</h2>
-            <p>Use your Google Account</p>
-            <input type="text" class="g-input" placeholder="Email or phone" value="player@gmail.com" readonly>
-            <div style="text-align:left; font-size:14px; color:#1a73e8; margin-bottom:30px; cursor:pointer;">Forgot email?</div>
-            <div style="overflow:hidden;">
-                <button class="g-btn" onclick="closeFakeAuth('google')">Next</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Facebook Mock -->
-    <div id="facebookModal" class="fake-auth-modal">
-        <div class="fb-card">
-            <div class="fb-logo">facebook</div>
-            <div class="fb-box">
-                <p style="font-size:18px; margin-bottom:20px;">Log in to Facebook</p>
-                <input type="text" class="fb-input" placeholder="Email or Phone Number" value="player@fb.com" readonly>
-                <input type="password" class="fb-input" placeholder="Password" value="********" readonly>
-                <button class="fb-btn" onclick="closeFakeAuth('facebook')">Log In</button>
-                <div style="margin-top:15px; color:#1877f2; font-size:14px; cursor:pointer;">Forgotten account?</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Apple Mock -->
-    <div id="appleModal" class="fake-auth-modal">
-        <div class="apple-card">
-            <div class="apple-logo"></div>
-            <h2>Sign in with Apple ID</h2>
-            <p style="margin-top:10px; color:#666;">Use your Apple ID to sign in to DinoAdventure.</p>
-            <input type="text" class="input-field" value="player@icloud.com" readonly style="text-align:center; margin-top:20px;">
-            <button class="apple-btn" onclick="closeFakeAuth('apple')">Continue</button>
-        </div>
-    </div>
-
+    <!-- 偽裝登入界面 -->
+    <div id="googleModal" class="fake-auth-modal"><div class="google-card"><h2>Google 登入</h2><input type="text" class="g-input" value="player@gmail.com" readonly><button class="g-btn" onclick="closeFakeAuth('google')">繼續</button></div></div>
+    <div id="facebookModal" class="fake-auth-modal"><div class="fb-card"><div class="fb-logo">facebook</div><div class="fb-box"><button class="fb-btn" onclick="closeFakeAuth('facebook')">以訪客繼續</button></div></div></div>
+    <div id="appleModal" class="fake-auth-modal"><div class="apple-card"><div class="apple-logo"></div><button class="apple-btn" onclick="closeFakeAuth('apple')">使用 Apple ID 繼續</button></div></div>
 
     <script>
+        // ---------- 全域變數 ----------
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-
-        const translations = {
-            'zh-TW': {
-                score: "分數", aiHelp: "AI 幫我玩", pause: "暫停", menuDesc: "避開炸彈 💣，吃掉黑點 ⚫！",
-                easy: "簡單", medium: "中等", hard: "困難", veryHard: "超級困難", hell: "超級無敵困難",
-                start: "開始遊戲", chooseAI: "選擇 AI 運算模型 🧠", aiDesc: "選擇越高級的模型，閃避運算越精準。",
-                cancel: "取消 / 關閉 AI", settings: "設定", guestMsg: "您目前是訪客身份，分數僅保存在本機。",
-                or: "或", sendCode: "發送驗證碼", otpMsg: "請輸入發送到您裝置的驗證碼：",
-                synced: "雲端同步已開啟 ✅", logout: "登出", darkMode: "深色模式", language: "語言 (Language)",
-                gameOver: "遊戲結束 😢", yourScore: "你的分數", highScore: "歷史最高", playAgain: "再來一局",
-                loginSuccess: "登入成功！歡迎回來，", syncPrompt: "發現雲端有更高的分數，已同步！",
-                localHigher: "您的本機分數較高，已上傳至雲端！",
-                showFPS: "顯示 FPS", disableVSync: "關閉 V-Sync (可能導致畫面撕裂，但會解鎖 FPS)"
-            },
-            'en': {
-                score: "Score", aiHelp: "AI Pilot", pause: "Pause", menuDesc: "Dodge Bombs 💣, Eat Dots ⚫!",
-                easy: "Easy", medium: "Medium", hard: "Hard", veryHard: "Very Hard", hell: "Nightmare",
-                start: "Start Game", chooseAI: "Select AI Model 🧠", aiDesc: "Higher tier models have better evasion logic.",
-                cancel: "Cancel / Disable AI", settings: "Settings", guestMsg: "You are a guest. Scores are local only.",
-                or: "OR", sendCode: "Send Code", otpMsg: "Enter the code sent to your device:",
-                synced: "Cloud Sync Active ✅", logout: "Logout", darkMode: "Dark Mode", language: "Language",
-                gameOver: "Game Over 😢", yourScore: "Score", highScore: "Best", playAgain: "Play Again",
-                loginSuccess: "Login Success! Welcome, ", syncPrompt: "Found higher score in cloud. Synced!",
-                localHigher: "Local score is higher. Uploaded to cloud!",
-                showFPS: "Show FPS", disableVSync: "Disable V-Sync (May tear, unlocks FPS)"
-            }
-        };
-        
-        let currentLang = 'zh-TW';
-        let isDarkMode = false;
-        let userProfile = null;
-        
-        // FPS & V-Sync
-        let isFpsShown = false;
-        let isVSyncDisabled = false;
-        let lastFrameTime = performance.now();
-        let frameCount = 0;
-        let lastFpsUpdateTime = 0;
-        let currentFps = 60;
-        let rafId; 
-        let fpsIntervalId = null; // 用於 setTimeout loop
-
-        // UI 元素
-        const splashScreen = document.getElementById('splashScreen');
-        const menuModal = document.getElementById('menuModal');
-        const aiModal = document.getElementById('aiModal');
-        const settingsModal = document.getElementById('settingsModal');
-        const systemNotification = document.getElementById('systemNotification');
-        const notifMessage = document.getElementById('notifMessage');
-        const fpsCounter = document.getElementById('fpsCounter');
-        const fpsToggle = document.getElementById('fpsToggle'); // 新增 FPS Toggle 變數
-        const vSyncToggle = document.getElementById('vSyncToggle'); // 新增 V-Sync Toggle 變數
-        
-        const startBtn = document.getElementById('startBtn');
-        const aiBtn = document.getElementById('aiBtn');
-        const pauseBtn = document.getElementById('pauseBtn');
-        const settingsBtn = document.getElementById('settingsBtn');
-        
-        const scoreDisplay = document.getElementById('scoreDisplay');
-        const highScoreDisplay = document.getElementById('highScoreDisplay');
-        const livesDisplay = document.querySelector('.lives');
-        const diffButtons = document.querySelectorAll('#diffSelect .list-btn');
-        const aiRespawnMsg = document.getElementById('aiRespawnMsg');
-
-        // 遊戲狀態
-        let gameState = 'SPLASH'; 
-        let difficulty = 1; 
-        let score = 0;
+        let gameState = 'SPLASH'; let difficulty = 1, score = 0, lives = 3, isAiActive = false, currentAiModel = 'Chiu-Chen 1', aiPerf = 1.0;
         let localHighScore = parseInt(localStorage.getItem('dinoHighScore') || '0');
-        let lives = 3;
-        let isAiActive = false;
-        let currentAiModelName = 'Chiu-Chen 1';
-        let aiPerformanceMultiplier = 1.0; 
-
+        let userProfile = null; let isDarkMode = false, isFpsShown = false, isVSyncDisabled = false;
+        let currentLang = 'zh-TW'; let lastFrameTime = 0, frameCount = 0, lastFpsUpdate = 0, currentFps = 60;
+        let rafId = null, timeoutId = null;
+        
+        const translations = { 'zh-TW':{score:"分數",aiHelp:"AI 幫我玩",pause:"暫停",menuDesc:"避開炸彈 💣，吃掉黑點 ⚫！",easy:"簡單",medium:"中等",hard:"困難",veryHard:"超級困難",hell:"地獄",start:"開始遊戲",chooseAI:"選擇 AI 模型",aiDesc:"進階模型閃避更強",cancel:"取消 AI",settings:"設定",guestMsg:"訪客模式分數本地",or:"或",sendCode:"發送驗證碼",otpMsg:"請輸入驗證碼",synced:"雲端同步",logout:"登出",darkMode:"深色",language:"語言",gameOver:"遊戲結束",yourScore:"得分",highScore:"最高紀錄",playAgain:"再玩一次",loginSuccess:"登入成功",syncPrompt:"同步雲端高分",localHigher:"本機分數已上傳",showFPS:"顯示幀率",disableVSync:"解鎖FPS模式(關閉垂直同步)"},
+        'en':{score:"Score",aiHelp:"AI Pilot",pause:"Pause",menuDesc:"Dodge Bombs 💣, Eat Dots ⚫!",easy:"Easy",medium:"Medium",hard:"Hard",veryHard:"Very Hard",hell:"Nightmare",start:"Start",chooseAI:"Select AI",aiDesc:"Higher tier = better evade",cancel:"Cancel AI",settings:"Settings",guestMsg:"Guest mode local only",or:"OR",sendCode:"Send Code",otpMsg:"Enter OTP",synced:"Cloud Sync",logout:"Logout",darkMode:"Dark Mode",language:"Language",gameOver:"Game Over",yourScore:"Score",highScore:"Best",playAgain:"Play again",loginSuccess:"Welcome",syncPrompt:"Cloud highscore synced",localHigher:"Local uploaded",showFPS:"Show FPS",disableVSync:"Unlock FPS (Disable V-Sync)"}};
+        function t(k){return translations[currentLang][k]||k;}
+        
+        // DOM 元素
+        const splash = document.getElementById('splashScreen'), menuModal = document.getElementById('menuModal'), aiModal = document.getElementById('aiModal'), settingsModal = document.getElementById('settingsModal');
+        const startBtn = document.getElementById('startBtn'), aiBtn = document.getElementById('aiBtn'), pauseBtn = document.getElementById('pauseBtn'), settingsBtn = document.getElementById('settingsBtn');
+        const scoreDisplay = document.getElementById('scoreDisplay'), highScoreDisplay = document.getElementById('highScoreDisplay'), livesDisplay = document.querySelector('.lives');
+        const fpsCounterDiv = document.getElementById('fpsCounter'), fpsToggleChk = document.getElementById('fpsToggle'), vSyncToggleChk = document.getElementById('vSyncToggle');
+        const darkModeToggle = document.getElementById('darkModeToggle'), systemNotif = document.getElementById('systemNotification'), notifMsg = document.getElementById('notifMessage');
+        
         highScoreDisplay.textContent = localHighScore;
-
-        window.addEventListener('load', () => {
-            const savedTheme = localStorage.getItem('dinoTheme');
-            if (savedTheme === 'dark') {
-                document.body.setAttribute('data-theme', 'dark');
-                document.getElementById('darkModeToggle').checked = true;
-                isDarkMode = true;
-            }
-            const savedUser = localStorage.getItem('dinoUser');
-            if (savedUser) {
-                userProfile = JSON.parse(savedUser);
-                showUserView();
-                if (userProfile.highScore > localHighScore) {
-                    localHighScore = userProfile.highScore;
-                    localStorage.setItem('dinoHighScore', localHighScore);
-                    highScoreDisplay.textContent = localHighScore;
-                }
-            }
-            // 讀取 FPS/V-Sync 狀態
-            isFpsShown = localStorage.getItem('dinoFpsShown') === 'true';
-            isVSyncDisabled = localStorage.getItem('dinoVSyncDisabled') === 'true';
-            fpsToggle.checked = isFpsShown;
-            vSyncToggle.checked = isVSyncDisabled;
-            fpsCounter.style.display = isFpsShown ? 'block' : 'none';
-
-            setTimeout(() => {
-                splashScreen.classList.add('fade-out');
-                setTimeout(() => {
-                    splashScreen.style.display = 'none';
-                    menuModal.classList.remove('hidden');
-                    gameState = 'MENU';
-                    resizeCanvas();
-                }, 800); 
-            }, 2500);
-        });
-
-        // 綁定 FPS Toggle (僅控制顯示)
-        fpsToggle.addEventListener('change', (e) => {
-            isFpsShown = e.target.checked;
-            fpsCounter.style.display = isFpsShown ? 'block' : 'none';
-            localStorage.setItem('dinoFpsShown', isFpsShown);
-        });
-
-        // 綁定 V-Sync Toggle (控制遊戲迴圈模式)
-        vSyncToggle.addEventListener('change', (e) => {
-            isVSyncDisabled = e.target.checked;
-            localStorage.setItem('dinoVSyncDisabled', isVSyncDisabled);
-            
-            // 透過 Toast 提醒使用者效果
-            if (isVSyncDisabled) {
-                showNotification(t('disableVSync'));
-            } else {
-                showNotification("V-Sync 已開啟 (FPS 鎖定) ✅");
-            }
-
-            // 立即切換 Loop 模式 (如果在遊戲中)
-            if (gameState === 'PLAYING') {
-                cancelAnimationFrame(rafId);
-                clearTimeout(fpsIntervalId);
-                lastFrameTime = performance.now();
-                runGameLoop();
-            }
-        });
-
-        document.getElementById('darkModeToggle').addEventListener('change', (e) => {
-            isDarkMode = e.target.checked;
-            document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-            localStorage.setItem('dinoTheme', isDarkMode ? 'dark' : 'light');
-        });
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'zh-TW' ? 'en' : 'zh-TW';
-            document.getElementById('langToggle').textContent = currentLang === 'zh-TW' ? 'English' : '繁體中文';
-            updateText();
+        
+        // 遊戲物件
+        const gameObj = { player: { x: 0, y: 0, size: 40, speed: 5 }, dots: [], bombs: [], mouse: { x: null, y: null, active: false } };
+        const keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, a: false, s: false, d: false };
+        
+        const SETTINGS = { 0:{bombSpeed:2,bombRate:100,bombCount:3},1:{bombSpeed:4,bombRate:80,bombCount:5},2:{bombSpeed:6,bombRate:60,bombCount:8},3:{bombSpeed:9,bombRate:40,bombCount:12},4:{bombSpeed:13,bombRate:20,bombCount:20} };
+        
+        function showNotification(msg){ notifMsg.textContent=msg; systemNotif.classList.add('show'); setTimeout(()=>systemNotif.classList.remove('show'),5000); }
+        function resizeCanvas(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; if(gameState!=='PLAYING'){ gameObj.player.x=canvas.width/2; gameObj.player.y=canvas.height/2; } }
+        window.addEventListener('resize',resizeCanvas);
+        
+        // 控制
+        function handlePointer(x,y){ if(gameState==='PLAYING' && !isAiActive){ gameObj.mouse.x=x; gameObj.mouse.y=y; gameObj.mouse.active=true; } }
+        canvas.addEventListener('mousemove',e=>handlePointer(e.clientX,e.clientY));
+        canvas.addEventListener('touchmove',e=>{ e.preventDefault(); handlePointer(e.touches[0].clientX,e.touches[0].clientY); },{passive:false});
+        canvas.addEventListener('touchstart',e=>{ handlePointer(e.touches[0].clientX,e.touches[0].clientY); });
+        window.addEventListener('keydown',e=>{ if(gameState==='PLAYING'){ if(keys.hasOwnProperty(e.key)) keys[e.key]=true; if(e.key==='Escape') togglePause(); } });
+        window.addEventListener('keyup',e=>{ if(keys.hasOwnProperty(e.key)) keys[e.key]=false; });
+        
+        // AI 輔助
+        function updateAiBtnStyle(){ 
+            if(isAiActive){ aiBtn.innerHTML=`🤖 ${currentAiModel.replace('Chiu-Chen','CC')}`; aiBtn.classList.add('active'); gameObj.mouse.active=false; }
+            else{ aiBtn.innerHTML=`🤖 ${t('aiHelp')}`; aiBtn.classList.remove('active'); }
         }
-
-        function updateText() {
-            const t = translations[currentLang];
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (t[key]) el.textContent = t[key];
-            });
-            if (isAiActive) updateAiBtnStyle();
+        function openAiMenu(){ if(gameState==='PLAYING') gameState='PAUSED'; aiModal.classList.remove('hidden'); }
+        window.selectAiModel = function(name,mult){ currentAiModel=name; aiPerf=mult; isAiActive=true; updateAiBtnStyle(); aiModal.classList.add('hidden'); if(gameState==='PAUSED' && lives>0) gameState='PLAYING'; lastFrameTime=performance.now(); runGameLoop(); };
+        window.cancelAiMenu = function(){ isAiActive=false; updateAiBtnStyle(); aiModal.classList.add('hidden'); if(gameState==='PAUSED' && lives>0) gameState='PLAYING'; lastFrameTime=performance.now(); runGameLoop(); };
+        document.querySelectorAll('.ai-model-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ const name=btn.getAttribute('data-ai'); const mult=parseFloat(btn.getAttribute('data-mult')); selectAiModel(name,mult); }); });
+        
+        function togglePause(){
+            if(gameState==='PLAYING'){ gameState='PAUSED'; pauseBtn.innerHTML="▶️"; cancelAnimationFrame(rafId); clearTimeout(timeoutId); drawPauseScreen(); }
+            else if(gameState==='PAUSED'){ gameState='PLAYING'; pauseBtn.innerHTML="⏸️ "+t('pause'); lastFrameTime=performance.now(); runGameLoop(); }
+        }
+        function drawPauseScreen(){ ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.fillStyle='white'; ctx.font='bold 40px Arial'; ctx.textAlign='center'; ctx.fillText(t('pause'),canvas.width/2,canvas.height/2); }
+        
+        // 遊戲機制
+        function initGame(preserveAI=false){ gameObj.player.x=canvas.width/2; gameObj.player.y=canvas.height/2; gameObj.dots=[]; gameObj.bombs=[]; score=0; lives=3; if(!preserveAI){ isAiActive=false; updateAiBtnStyle(); } spawnDot(); updateHUD(); }
+        function spawnDot(){ gameObj.dots.push({ x:50+Math.random()*(canvas.width-100), y:50+Math.random()*(canvas.height-100), radius:10 }); }
+        function spawnBomb(){ let side=Math.floor(Math.random()*4), x,y,vx,vy, spd=SETTINGS[difficulty].bombSpeed+Math.random(); if(side===0){ x=Math.random()*canvas.width; y=-30; vx=(Math.random()-0.5)*spd; vy=spd; }
+        else if(side===1){ x=canvas.width+30; y=Math.random()*canvas.height; vx=-spd; vy=(Math.random()-0.5)*spd; }
+        else if(side===2){ x=Math.random()*canvas.width; y=canvas.height+30; vx=(Math.random()-0.5)*spd; vy=-spd; }
+        else{ x=-30; y=Math.random()*canvas.height; vx=spd; vy=(Math.random()-0.5)*spd; }
+        gameObj.bombs.push({x,y,vx,vy,size:30,angle:0,rot:(Math.random()-0.5)*0.2}); }
+        function updateHUD(){ scoreDisplay.textContent=score; highScoreDisplay.textContent=localHighScore; let hearts=''; for(let i=0;i<lives;i++) hearts+='❤️'; livesDisplay.textContent=hearts; }
+        
+        function runAI(){
+            let player=gameObj.player, closest=null, minD=Infinity;
+            gameObj.dots.forEach(d=>{ let d2=Math.hypot(d.x-player.x,d.y-player.y); if(d2<minD){ minD=d2; closest=d; } });
+            let dx=0, dy=0;
+            if(closest){ dx=(closest.x-player.x)/minD; dy=(closest.y-player.y)/minD; }
+            let radius=150+difficulty*15; radius*=aiPerf;
+            gameObj.bombs.forEach(b=>{ let dist=Math.hypot(b.x-player.x,b.y-player.y); if(dist<radius){ let force=(radius-dist)/radius; let rx=(player.x-b.x)/dist, ry=(player.y-b.y)/dist; let w=3.2*aiPerf; dx+=rx*force*w; dy+=ry*force*w; } });
+            if(player.x<50) dx+=1.5; if(player.x>canvas.width-50) dx-=1.5; if(player.y<50) dy+=1.5; if(player.y>canvas.height-50) dy-=1.5;
+            let len=Math.hypot(dx,dy); if(len>0){ dx/=len; dy/=len; } return {x:dx,y:dy};
         }
         
-        function t(key) { return translations[currentLang][key] || key; }
-
-        // --- 驗證與登入邏輯 (Mock) ---
-        let tempProvider = '';
-        let generatedOtp = '';
-
-        window.openFakeAuth = function(provider) {
-            tempProvider = provider;
-            let modalId = '';
-            if(provider === 'google') modalId = 'googleModal';
-            if(provider === 'facebook') modalId = 'facebookModal';
-            if(provider === 'apple') modalId = 'appleModal';
-            document.getElementById(modalId).classList.add('active');
-        };
-
-        window.closeFakeAuth = function(provider) {
-            let modalId = '';
-            if(provider === 'google') modalId = 'googleModal';
-            if(provider === 'facebook') modalId = 'facebookModal';
-            if(provider === 'apple') modalId = 'appleModal';
-            document.getElementById(modalId).classList.remove('active');
-            triggerOtpFlow(provider);
-        };
-
-        window.triggerEmailLogin = function() {
-            tempProvider = 'Email';
-            const input = document.getElementById('loginInput').value;
-            if (!input) { alert("Please enter Email or Phone"); return; }
-            triggerOtpFlow('Email');
-        }
-
-        function triggerOtpFlow(providerName) {
-            document.getElementById('guestView').classList.add('hidden');
-            document.getElementById('otpView').classList.remove('hidden');
-            generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
-            let providerDisplay = providerName.charAt(0).toUpperCase() + providerName.slice(1);
-            showNotification(`來自 ${providerDisplay} 的驗證碼：${generatedOtp}`);
-            document.querySelector('.otp-input').focus();
-        }
-
-        function showNotification(msg) {
-            notifMessage.textContent = msg;
-            systemNotification.classList.add('show');
-            setTimeout(() => { systemNotification.classList.remove('show'); }, 8000);
-        }
-
-        window.moveFocus = function(elem, nextIdx) {
-            if (elem.value.length >= 1) {
-                const inputs = document.querySelectorAll('.otp-input');
-                if (nextIdx < inputs.length) inputs[nextIdx].focus();
-            }
-        };
-
-        window.verifyOtp = function() {
-            const inputs = document.querySelectorAll('.otp-input');
-            let code = '';
-            inputs.forEach(i => code += i.value);
+        function update(dt){
+            let scale=dt/(1000/60); let player=gameObj.player; let dx=0,dy=0;
+            if(isAiActive){ let move=runAI(); dx=move.x; dy=move.y; }
+            else if(gameObj.mouse.active){ let dist=Math.hypot(gameObj.mouse.x-player.x,gameObj.mouse.y-player.y); if(dist>5){ dx=(gameObj.mouse.x-player.x)/dist; dy=(gameObj.mouse.y-player.y)/dist; } }
+            else{ if(keys.ArrowUp||keys.w) dy=-1; if(keys.ArrowDown||keys.s) dy=1; if(keys.ArrowLeft||keys.a) dx=-1; if(keys.ArrowRight||keys.d) dx=1; if(dx!==0&&dy!==0){ let f=0.7071; dx*=f; dy*=f; } }
+            player.x+=dx*player.speed*scale; player.y+=dy*player.speed*scale;
+            let half=player.size/2; player.x=Math.min(Math.max(player.x,half),canvas.width-half); player.y=Math.min(Math.max(player.y,half),canvas.height-half);
             
-            if (code.length === 4) {
-                if (code === generatedOtp) {
-                    systemNotification.classList.remove('show');
-                    setTimeout(() => {
-                        const mockName = tempProvider === 'Email' ? 'Player' : tempProvider.charAt(0).toUpperCase() + tempProvider.slice(1) + ' User';
-                        let cloudScore = Math.floor(Math.random() * 500); 
-                        if (localHighScore > cloudScore) {
-                            // 使用 custom modal 替代 alert
-                            showNotification(t('loginSuccess') + mockName + "!\n" + t('localHigher'));
-                            cloudScore = localHighScore;
-                        } else {
-                            showNotification(t('loginSuccess') + mockName + "!\n" + t('syncPrompt'));
-                            localHighScore = cloudScore;
-                            localStorage.setItem('dinoHighScore', localHighScore);
-                            highScoreDisplay.textContent = localHighScore;
-                        }
-                        userProfile = { name: mockName, provider: tempProvider, highScore: cloudScore };
-                        localStorage.setItem('dinoUser', JSON.stringify(userProfile));
-                        showUserView();
-                    }, 300);
-                } else {
-                    inputs.forEach(i => i.value = ''); inputs[0].focus();
-                    showNotification("驗證碼錯誤，請再試一次 ❌");
-                }
+            if(gameObj.bombs.length<SETTINGS[difficulty].bombCount && Math.random()<0.02*scale) spawnBomb();
+            for(let i=gameObj.bombs.length-1;i>=0;i--){ let b=gameObj.bombs[i]; b.x+=b.vx*scale; b.y+=b.vy*scale; b.angle+=b.rot*scale;
+                if(b.x<-100||b.x>canvas.width+100||b.y<-100||b.y>canvas.height+100){ gameObj.bombs.splice(i,1); continue; }
+                if(Math.hypot(player.x-b.x,player.y-b.y)<(player.size/2+b.size/2-5)) takeDamage(i);
             }
-        };
-
-        function showUserView() {
-            document.getElementById('otpView').classList.add('hidden');
-            document.getElementById('guestView').classList.add('hidden');
-            document.getElementById('userView').classList.remove('hidden');
-            document.getElementById('userName').textContent = userProfile.name;
-            document.getElementById('userAvatar').textContent = userProfile.name.charAt(0);
-            document.querySelectorAll('.otp-input').forEach(i => i.value = '');
-        }
-
-        window.logout = function() {
-            localStorage.removeItem('dinoUser');
-            userProfile = null;
-            document.getElementById('userView').classList.add('hidden');
-            document.getElementById('guestView').classList.remove('hidden');
-        };
-
-        settingsBtn.addEventListener('click', () => {
-            if (gameState === 'PLAYING') togglePause();
-            settingsModal.classList.remove('hidden');
-        });
-
-        window.closeSettings = function() {
-            settingsModal.classList.add('hidden');
-        };
-
-        // --- 遊戲核心 ---
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            if (gameState === 'MENU' || gameState === 'SPLASH') {
-                gameObj.player.x = canvas.width / 2;
-                gameObj.player.y = canvas.height / 2;
+            if(gameObj.dots.length===0) spawnDot();
+            for(let i=gameObj.dots.length-1;i>=0;i--){ let d=gameObj.dots[i]; if(Math.hypot(player.x-d.x,player.y-d.y)<(player.size/2+d.radius)){ score+=10*(difficulty+1);
+                if(score>localHighScore){ localHighScore=score; localStorage.setItem('dinoHighScore',localHighScore); if(userProfile){ userProfile.highScore=localHighScore; localStorage.setItem('dinoUser',JSON.stringify(userProfile)); } }
+                gameObj.dots.splice(i,1); updateHUD(); spawnDot(); if(Math.random()>0.7) spawnDot(); }
             }
         }
-        window.addEventListener('resize', resizeCanvas);
-
-        const SETTINGS = {
-            0: { name: 'easy', bombSpeed: 2, bombRate: 100, bombCount: 3 },
-            1: { name: 'medium', bombSpeed: 4, bombRate: 80, bombCount: 5 },
-            2: { name: 'hard', bombSpeed: 6, bombRate: 60, bombCount: 8 },
-            3: { name: 'veryHard', bombSpeed: 9, bombRate: 40, bombCount: 12 },
-            4: { name: 'hell', bombSpeed: 13, bombRate: 20, bombCount: 20 }
-        };
-
-        const gameObj = {
-            player: { x: 0, y: 0, size: 40, speed: 5, vx: 0, vy: 0 },
-            dots: [], bombs: [], mouse: { x: null, y: null, active: false }
-        };
-        const keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, a: false, s: false, d: false };
-
-        window.addEventListener('keydown', e => {
-            if (gameState !== 'PLAYING') return;
-            if (keys.hasOwnProperty(e.key) || keys.hasOwnProperty(e.key.toLowerCase())) {
-                keys[e.key] = true; gameObj.mouse.active = false;
-            }
-            if (e.key === 'Escape') togglePause();
-        });
-        window.addEventListener('keyup', e => {
-             if (gameState !== 'PLAYING') return;
-            if (keys.hasOwnProperty(e.key) || keys.hasOwnProperty(e.key.toLowerCase())) keys[e.key] = false;
-        });
-        function handlePointerMove(x, y) {
-            if (gameState === 'PLAYING' && !isAiActive) { gameObj.mouse.x = x; gameObj.mouse.y = y; gameObj.mouse.active = true; }
+        function takeDamage(idx){ gameObj.bombs.splice(idx,1); lives--; updateHUD(); canvas.style.transform='translate(5px,5px)'; setTimeout(()=>canvas.style.transform='',100);
+            if(lives<=0){ if(isAiActive){ let msgDiv=document.getElementById('aiRespawnMsg'); msgDiv.innerText=`${currentAiModel} AI復活中✨`; msgDiv.classList.add('show'); setTimeout(()=>msgDiv.classList.remove('show'),1000); initGame(true); } else gameOver(); }
         }
-        canvas.addEventListener('mousemove', e => handlePointerMove(e.clientX, e.clientY));
-        canvas.addEventListener('touchmove', e => {
-            if (gameState !== 'PLAYING') return;
-            e.preventDefault(); handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: false });
-        canvas.addEventListener('touchstart', e => {
-             if (gameState !== 'PLAYING') return;
-            handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: false });
-
-        diffButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                diffButtons.forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
-                difficulty = parseInt(btn.dataset.diff);
-            });
-        });
-
-        startBtn.addEventListener('click', startGame);
-        pauseBtn.addEventListener('click', () => { togglePause(); pauseBtn.blur(); });
-
-        aiBtn.addEventListener('click', () => { if (isAiActive) cancelAiMenu(); else openAiMenu(); aiBtn.blur(); });
-        function openAiMenu() { if (gameState === 'PLAYING') gameState = 'PAUSED'; aiModal.classList.remove('hidden'); }
-        function closeAiModalOnly() {
-            aiModal.classList.add('hidden');
-            if (gameState === 'PAUSED' && lives > 0) { gameState = 'PLAYING'; lastFrameTime = performance.now(); runGameLoop(); }
-        }
-        window.selectAiModel = function(modelName, multiplier) { currentAiModelName = modelName; aiPerformanceMultiplier = multiplier; isAiActive = true; updateAiBtnStyle(); closeAiModalOnly(); };
-        window.cancelAiMenu = function() { isAiActive = false; updateAiBtnStyle(); closeAiModalOnly(); };
-        function updateAiBtnStyle() {
-            if (isAiActive) {
-                let displayName = currentAiModelName.replace('Chiu-Chen', 'CC');
-                aiBtn.innerHTML = `🤖 ${displayName}`; aiBtn.classList.add('active'); gameObj.mouse.active = false;
-            } else { aiBtn.innerHTML = `🤖 ${t('aiHelp')}`; aiBtn.classList.remove('active'); }
-        }
-
-        function togglePause() {
-            if (!aiModal.classList.contains('hidden') || !menuModal.classList.contains('hidden') || !settingsModal.classList.contains('hidden')) return;
-            if (gameState === 'PLAYING') { 
-                gameState = 'PAUSED'; 
-                pauseBtn.innerHTML = "▶️"; 
-                drawPauseScreen(); 
-                cancelAnimationFrame(rafId); 
-                clearTimeout(fpsIntervalId); 
-            }
-            else if (gameState === 'PAUSED') { 
-                gameState = 'PLAYING'; 
-                pauseBtn.innerHTML = "⏸️ " + t('pause'); 
-                lastFrameTime = performance.now(); 
-                runGameLoop(); 
-            }
-        }
-        function drawPauseScreen() {
-            ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = isDarkMode ? 'white' : '#333'; ctx.font = 'bold 40px Arial'; ctx.textAlign = 'center';
-            ctx.fillText(t('pause'), canvas.width/2, canvas.height/2);
-        }
-
-        function initGame(preserveAI = false) {
-            gameObj.player.x = canvas.width / 2; gameObj.player.y = canvas.height / 2;
-            gameObj.player.vx = 0; gameObj.player.vy = 0;
-            gameObj.dots = []; gameObj.bombs = []; score = 0; lives = 3;
-            if (!preserveAI) { isAiActive = false; updateAiBtnStyle(); }
-            updateHUD(); spawnDot();
-        }
-
-        function spawnDot() {
-            const pad = 50;
-            gameObj.dots.push({ x: pad + Math.random() * (canvas.width - pad * 2), y: pad + Math.random() * (canvas.height - pad * 2), radius: 10 });
-        }
-        function spawnBomb() {
-            const side = Math.floor(Math.random() * 4); let x, y, vx, vy;
-            const diffSettings = SETTINGS[difficulty]; const speed = diffSettings.bombSpeed + Math.random();
-            switch(side) {
-                case 0: x = Math.random() * canvas.width; y = -30; vx = (Math.random() - 0.5) * speed; vy = speed; break;
-                case 1: x = canvas.width + 30; y = Math.random() * canvas.height; vx = -speed; vy = (Math.random() - 0.5) * speed; break;
-                case 2: x = Math.random() * canvas.width; y = canvas.height + 30; vx = (Math.random() - 0.5) * speed; vy = -speed; break;
-                case 3: x = -30; y = Math.random() * canvas.height; vx = speed; vy = (Math.random() - 0.5) * speed; break;
-            }
-            gameObj.bombs.push({ x, y, vx, vy, size: 30, angle: 0, rotationSpeed: (Math.random() - 0.5) * 0.2 });
-        }
-
-        function updateHUD() {
-            scoreDisplay.textContent = score; highScoreDisplay.textContent = localHighScore;
-            let hearts = ''; for(let i=0; i<lives; i++) hearts += '❤️'; livesDisplay.textContent = hearts;
-        }
-
-        function startGame() { 
-            menuModal.classList.add('hidden'); 
-            gameState = 'PLAYING'; 
-            initGame(); 
-            lastFrameTime = performance.now(); 
-            // 確保每次開始遊戲都啟動正確的迴圈模式
-            cancelAnimationFrame(rafId);
-            clearTimeout(fpsIntervalId);
-            runGameLoop(); 
-        }
-        function gameOver() {
-            gameState = 'GAMEOVER'; cancelAnimationFrame(rafId); clearTimeout(fpsIntervalId);
-            const menuTitle = document.getElementById('menuTitle'); const menuDesc = document.getElementById('menuDesc');
-            menuTitle.textContent = t('gameOver');
-            menuDesc.innerHTML = `${t('yourScore')}：<span style="color:#2b6cb0; font-weight:bold; font-size:1.5em;">${score}</span><br>${t('highScore')}：<span style="color:#d69e2e; font-weight:bold; font-size:1.2em;">${localHighScore}</span><br>Difficulty：${t(SETTINGS[difficulty].name)}`;
-            startBtn.textContent = t('playAgain');
-            menuModal.classList.remove('hidden');
-            isAiActive = false; updateAiBtnStyle();
-        }
-
-        function runAI() {
-            const player = gameObj.player; const dots = gameObj.dots; const bombs = gameObj.bombs;
-            if (dots.length === 0) return { x: 0, y: 0 };
-            let closestDot = null; let minDist = Infinity;
-            dots.forEach(dot => { const d = Math.hypot(dot.x - player.x, dot.y - player.y); if (d < minDist) { minDist = d; closestDot = dot; } });
-            let moveX = 0; let moveY = 0;
-            if (closestDot) { moveX = (closestDot.x - player.x) / minDist; moveY = (closestDot.y - player.y) / minDist; }
-            const baseRadius = 150 + (difficulty * 20); const detectionRadius = baseRadius * aiPerformanceMultiplier;
-            bombs.forEach(bomb => {
-                const dist = Math.hypot(bomb.x - player.x, bomb.y - player.y);
-                if (dist < detectionRadius) {
-                    const force = (detectionRadius - dist) / detectionRadius;
-                    const repelX = (player.x - bomb.x) / dist; const repelY = (player.y - bomb.y) / dist;
-                    const weight = 3.5 * aiPerformanceMultiplier;
-                    moveX += repelX * force * weight; moveY += repelY * force * weight;
-                }
-            });
-            const wallMargin = 50;
-            if (player.x < wallMargin) moveX += 1; if (player.x > canvas.width - wallMargin) moveX -= 1;
-            if (player.y < wallMargin) moveY += 1; if (player.y > canvas.height - wallMargin) moveY -= 1;
-            return { x: moveX, y: moveY };
-        }
-
-        // 時間標準化 Update
-        function update(dt) {
-            // 基準為 60FPS (16.6ms)，計算時間縮放比例
-            const timeScale = dt / (1000 / 60); 
-
-            const player = gameObj.player; let dx = 0, dy = 0;
-            if (isAiActive) { const move = runAI(); const mag = Math.hypot(move.x, move.y); if (mag > 0) { dx = move.x / mag; dy = move.y / mag; } }
-            else if (gameObj.mouse.active) {
-                const dist = Math.hypot(gameObj.mouse.x - player.x, gameObj.mouse.y - player.y);
-                if (dist > 5) { dx = (gameObj.mouse.x - player.x) / dist; dy = (gameObj.mouse.y - player.y) / dist; }
-            } else {
-                if (keys.ArrowUp || keys.w) dy = -1; if (keys.ArrowDown || keys.s) dy = 1; if (keys.ArrowLeft || keys.a) dx = -1; if (keys.ArrowRight || keys.d) dx = 1;
-                if (dx !== 0 && dy !== 0) { const f = 1/Math.sqrt(2); dx *= f; dy *= f; }
-            }
-            
-            // 應用 TimeScale
-            player.vx = dx * player.speed * timeScale; 
-            player.vy = dy * player.speed * timeScale; 
-            player.x += player.vx; player.y += player.vy;
-
-            const halfSize = player.size / 2;
-            if (player.x < halfSize) player.x = halfSize; if (player.x > canvas.width - halfSize) player.x = canvas.width - halfSize;
-            if (player.y < halfSize) player.y = halfSize; if (player.y > canvas.height - halfSize) player.y = canvas.height - halfSize;
-            
-            // 炸彈生成邏輯
-            if (gameObj.bombs.length < SETTINGS[difficulty].bombCount) { 
-                // 補償：原本是每幀機率，現在乘上 timeScale
-                if (Math.random() * 100 < (SETTINGS[difficulty].bombRate / 20) * timeScale) spawnBomb(); 
-            }
-            for (let i = gameObj.bombs.length - 1; i >= 0; i--) {
-                let b = gameObj.bombs[i]; 
-                // 應用 TimeScale
-                b.x += b.vx * timeScale; 
-                b.y += b.vy * timeScale; 
-                b.angle += b.rotationSpeed * timeScale;
-                if (b.x < -100 || b.x > canvas.width + 100 || b.y < -100 || b.y > canvas.height + 100) { gameObj.bombs.splice(i, 1); continue; }
-                const dist = Math.hypot(player.x - b.x, player.y - b.y); if (dist < (player.size/2 + b.size/2 - 5)) takeDamage(i);
-            }
-            if (gameObj.dots.length === 0) spawnDot();
-            for (let i = gameObj.dots.length - 1; i >= 0; i--) {
-                let d = gameObj.dots[i]; const dist = Math.hypot(player.x - d.x, player.y - d.y);
-                if (dist < (player.size/2 + d.radius)) {
-                    score += 10 * (difficulty + 1);
-                    if (score > localHighScore) {
-                        localHighScore = score; localStorage.setItem('dinoHighScore', localHighScore);
-                        if (userProfile) { userProfile.highScore = localHighScore; localStorage.setItem('dinoUser', JSON.stringify(userProfile)); }
-                    }
-                    gameObj.dots.splice(i, 1); updateHUD(); spawnDot(); if(Math.random() > 0.7) spawnDot();
-                }
-            }
-        }
-
-        function takeDamage(bombIndex) {
-            gameObj.bombs.splice(bombIndex, 1); lives--; updateHUD();
-            const shake = 10; canvas.style.transform = `translate(${Math.random()*shake-shake/2}px, ${Math.random()*shake-shake/2}px)`;
-            setTimeout(() => canvas.style.transform = 'none', 200);
-            if (lives <= 0) { if (isAiActive) { showAiRespawnMsg(); initGame(true); } else gameOver(); }
-        }
-
-        function showAiRespawnMsg() {
-            aiRespawnMsg.innerHTML = `${currentAiModelName} ${t('synced').replace('✅','')} 🔄`;
-            aiRespawnMsg.classList.add('show'); setTimeout(() => aiRespawnMsg.classList.remove('show'), 1000);
-        }
-
-        function draw() {
-            ctx.fillStyle = isDarkMode ? '#1a202c' : '#f0f4f8'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = isDarkMode ? '#e2e8f0' : 'black';
-            gameObj.dots.forEach(dot => {
-                ctx.beginPath(); ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.beginPath(); ctx.arc(dot.x - 3, dot.y - 3, 3, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = isDarkMode ? '#e2e8f0' : 'black';
-            });
-            gameObj.bombs.forEach(b => {
-                ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.angle); ctx.font = `${b.size}px Arial`;
-                ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("💣", 0, 0); ctx.restore();
-            });
-            const p = gameObj.player; ctx.save(); ctx.translate(p.x, p.y); if (p.vx < 0) ctx.scale(-1, 1);
-            ctx.font = `${p.size}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("🦖", 0, 0);
-            if (isAiActive) {
-                ctx.font = '12px Arial'; ctx.fillStyle = isDarkMode ? '#d6bcfa' : '#805ad5'; ctx.scale(p.vx < 0 ? -1 : 1, 1);
-                let shortName = currentAiModelName.replace('Chiu-Chen', 'CC'); ctx.fillText(shortName, 0, -p.size/1.5);
-            }
+        function gameOver(){ gameState='GAMEOVER'; cancelAnimationFrame(rafId); clearTimeout(timeoutId); document.getElementById('menuTitle').innerText=t('gameOver'); document.getElementById('menuDesc').innerHTML=`${t('yourScore')}: <span style="color:#2b6cb0;">${score}</span><br>${t('highScore')}: <span style="color:#d69e2e;">${localHighScore}</span>`; startBtn.innerText=t('playAgain'); menuModal.classList.remove('hidden'); isAiActive=false; updateAiBtnStyle(); }
+        
+        function draw(){
+            ctx.fillStyle=isDarkMode?'#1a202c':'#f0f4f8'; ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle=isDarkMode?'#e2e8f0':'black';
+            gameObj.dots.forEach(d=>{ ctx.beginPath(); ctx.arc(d.x,d.y,d.radius,0,Math.PI*2); ctx.fill(); ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.beginPath(); ctx.arc(d.x-2,d.y-2,3,0,Math.PI*2); ctx.fill(); ctx.fillStyle=isDarkMode?'#e2e8f0':'black'; });
+            gameObj.bombs.forEach(b=>{ ctx.save(); ctx.translate(b.x,b.y); ctx.rotate(b.angle); ctx.font=`${b.size}px Arial`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText("💣",0,0); ctx.restore(); });
+            let p=gameObj.player; ctx.save(); ctx.translate(p.x,p.y); if(p.vx<0) ctx.scale(-1,1); ctx.font=`${p.size}px Arial`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText("🦖",0,0);
+            if(isAiActive){ ctx.font='bold 12px Arial'; ctx.fillStyle='#d6bcfa'; let short=currentAiModel.replace('Chiu-Chen','CC'); ctx.fillText(short,0,-p.size/1.6); }
             ctx.restore();
         }
-
-        // --- 核心 Game Loop (支援 V-Sync 切換) ---
-        function runGameLoop() {
-            const now = performance.now();
-            // 避免 dt 過大 (例如切換分頁回來)
-            let dt = now - lastFrameTime;
-            if (dt > 100) dt = 16.66; 
-            lastFrameTime = now;
-
-            update(dt);
-            draw();
-
-            // FPS 計算
-            frameCount++;
-            if (now - lastFpsUpdateTime >= 1000) {
-                currentFps = frameCount;
-                frameCount = 0;
-                lastFpsUpdateTime = now;
-                if (isFpsShown) fpsCounter.innerText = "FPS: " + currentFps;
-            }
-
-            if (gameState === 'PLAYING') {
-                if (isVSyncDisabled) {
-                    // 關閉 V-Sync: 使用 setTimeout 0 盡可能快跑 (解鎖 FPS)
-                    fpsIntervalId = setTimeout(runGameLoop, 0);
-                } else {
-                    // 開啟 V-Sync: 使用 requestAnimationFrame (鎖定 FPS)
-                    rafId = requestAnimationFrame(runGameLoop);
-                }
+        
+        function runGameLoop(){
+            const now=performance.now(); let dt=Math.min(now-lastFrameTime,50); if(dt<0) dt=16; lastFrameTime=now;
+            update(dt); draw();
+            frameCount++; if(now-lastFpsUpdate>=1000){ currentFps=frameCount; frameCount=0; lastFpsUpdate=now; if(isFpsShown) fpsCounterDiv.innerText=`FPS: ${currentFps}`; }
+            if(gameState==='PLAYING'){
+                if(isVSyncDisabled) timeoutId=setTimeout(runGameLoop,0);
+                else rafId=requestAnimationFrame(runGameLoop);
             }
         }
-
+        
+        function startGame(){ menuModal.classList.add('hidden'); gameState='PLAYING'; initGame(); lastFrameTime=performance.now(); cancelAnimationFrame(rafId); clearTimeout(timeoutId); runGameLoop(); }
+        
+        // 登入系統(簡化)
+        window.openFakeAuth=function(p){ document.getElementById(`${p}Modal`).classList.add('active'); };
+        window.closeFakeAuth=function(p){ document.getElementById(`${p}Modal`).classList.remove('active'); let fakeUser={name:`${p.toUpperCase()}用戶`,provider:p,highScore:localHighScore}; userProfile=fakeUser; localStorage.setItem('dinoUser',JSON.stringify(fakeUser)); document.getElementById('guestView').classList.add('hidden'); document.getElementById('userView').classList.remove('hidden'); document.getElementById('userName').innerText=fakeUser.name; document.getElementById('userAvatar').innerText=fakeUser.name[0]; showNotification(`${t('loginSuccess')} ${fakeUser.name}`); };
+        window.triggerEmailLogin=function(){ let email=document.getElementById('loginInput').value; if(!email) return; let code=Math.floor(1000+Math.random()*9000); showNotification(`驗證碼: ${code}`); document.getElementById('guestView').classList.add('hidden'); document.getElementById('otpView').classList.remove('hidden'); window.verifyOtp=function(){ let inputs=document.querySelectorAll('.otp-input'); let val=''; inputs.forEach(i=>val+=i.value); if(val===String(code)){ let fakeUser={name:email.split('@')[0],provider:'Email',highScore:localHighScore}; userProfile=fakeUser; localStorage.setItem('dinoUser',JSON.stringify(fakeUser)); document.getElementById('otpView').classList.add('hidden'); document.getElementById('userView').classList.remove('hidden'); document.getElementById('userName').innerText=fakeUser.name; document.getElementById('userAvatar').innerText=fakeUser.name[0]; showNotification(`登入成功！`); } else { showNotification(`驗證碼錯誤`); } }; };
+        window.logout=function(){ localStorage.removeItem('dinoUser'); userProfile=null; document.getElementById('userView').classList.add('hidden'); document.getElementById('guestView').classList.remove('hidden'); };
+        function closeSettings(){ settingsModal.classList.add('hidden'); }
+        function toggleLanguage(){ currentLang=currentLang==='zh-TW'?'en':'zh-TW'; document.getElementById('langToggle').innerText=currentLang==='zh-TW'?'English':'繁體中文'; updateText(); }
+        function updateText(){ document.querySelectorAll('[data-i18n]').forEach(el=>{ let key=el.getAttribute('data-i18n'); if(translations[currentLang][key]) el.innerText=translations[currentLang][key]; }); if(isAiActive) updateAiBtnStyle(); }
+        
+        // 設定事件綁定
+        fpsToggleChk.addEventListener('change',e=>{ isFpsShown=e.target.checked; fpsCounterDiv.style.display=isFpsShown?'block':'none'; localStorage.setItem('dinoFpsShown',isFpsShown); });
+        vSyncToggleChk.addEventListener('change',e=>{ isVSyncDisabled=e.target.checked; localStorage.setItem('dinoVSyncDisabled',isVSyncDisabled); showNotification(isVSyncDisabled?t('disableVSync'):"V-Sync 開啟(穩定60FPS)"); if(gameState==='PLAYING'){ cancelAnimationFrame(rafId); clearTimeout(timeoutId); lastFrameTime=performance.now(); runGameLoop(); } });
+        darkModeToggle.addEventListener('change',e=>{ isDarkMode=e.target.checked; document.body.setAttribute('data-theme',isDarkMode?'dark':'light'); localStorage.setItem('dinoTheme',isDarkMode?'dark':'light'); });
+        startBtn.addEventListener('click',startGame); pauseBtn.addEventListener('click',togglePause); aiBtn.addEventListener('click',()=>{ if(isAiActive) cancelAiMenu(); else openAiMenu(); }); settingsBtn.addEventListener('click',()=>{ if(gameState==='PLAYING') togglePause(); settingsModal.classList.remove('hidden'); });
+        document.querySelectorAll('#diffSelect .list-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('#diffSelect .list-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); difficulty=parseInt(btn.dataset.diff); }); });
+        
+        // 初始載入設定
+        (function init(){ let savedTheme=localStorage.getItem('dinoTheme'); if(savedTheme==='dark'){ document.body.setAttribute('data-theme','dark'); darkModeToggle.checked=true; isDarkMode=true; }
+        isFpsShown=localStorage.getItem('dinoFpsShown')==='true'; isVSyncDisabled=localStorage.getItem('dinoVSyncDisabled')==='true'; fpsToggleChk.checked=isFpsShown; vSyncToggleChk.checked=isVSyncDisabled; fpsCounterDiv.style.display=isFpsShown?'block':'none';
+        let savedUser=localStorage.getItem('dinoUser'); if(savedUser){ userProfile=JSON.parse(savedUser); document.getElementById('guestView').classList.add('hidden'); document.getElementById('userView').classList.remove('hidden'); document.getElementById('userName').innerText=userProfile.name; document.getElementById('userAvatar').innerText=userProfile.name[0]; if(userProfile.highScore>localHighScore){ localHighScore=userProfile.highScore; localStorage.setItem('dinoHighScore',localHighScore); highScoreDisplay.textContent=localHighScore; } }
+        setTimeout(()=>{ splash.classList.add('fade-out'); setTimeout(()=>{ splash.style.display='none'; menuModal.classList.remove('hidden'); gameState='MENU'; resizeCanvas(); },800); },2000); })();
     </script>
 </body>
 </html>
