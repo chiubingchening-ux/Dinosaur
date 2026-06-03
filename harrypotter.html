@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>哈利波特知識王 - 終極魔法測驗</title>
+    <title>哈利波特知識王 - 終極魔法測驗 Pro Max</title>
     <style>
         :root {
             --gold-light: #ffd700;
@@ -266,6 +266,7 @@
         /* 題目核心 */
         .quiz-body {
             min-height: 280px;
+            position: relative;
         }
 
         .question-text {
@@ -301,7 +302,7 @@
             box-shadow: 0 0 12px rgba(255,215,0,0.1);
         }
 
-        /* 選項反饋樣式 */
+        /* 選項反饋與彩蛋抹除樣式 */
         .option-item.correct {
             background: rgba(46, 204, 113, 0.25) !important;
             border-color: var(--correct-green) !important;
@@ -317,6 +318,14 @@
             box-shadow: 0 0 15px rgba(231, 76, 60, 0.3);
         }
 
+        .option-item.erased {
+            opacity: 0.15 !important;
+            pointer-events: none !important;
+            border-style: dashed !important;
+            text-decoration: line-through;
+            transform: scale(0.95);
+        }
+
         .option-item.disabled {
             pointer-events: none;
             opacity: 0.6;
@@ -326,7 +335,38 @@
             opacity: 1;
         }
 
-        /* 回饋區塊（解析與下一題） */
+        /* 【新功能】第 5 題限定彩蛋按鈕 */
+        .easter-egg-btn {
+            position: absolute;
+            bottom: -15px;
+            right: 0;
+            background: linear-gradient(135deg, #741212 0%, #3a0303 100%);
+            border: 2px solid #ff7675;
+            color: #ff7675;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 118, 117, 0.5);
+            font-weight: bold;
+            display: none;
+            z-index: 10;
+            animation: pulseGlow 2s infinite;
+            transition: all 0.3s;
+        }
+
+        .easter-egg-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px #ff7675;
+            color: #fff;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 118, 117, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(255, 118, 117, 0.9); }
+        }
+
+        /* 回饋區塊 */
         .feedback-panel {
             margin-top: 25px;
             background: rgba(10, 14, 20, 0.8);
@@ -419,7 +459,7 @@
             color: #fff;
         }
 
-        /* 答對全螢幕爆光特效面版 */
+        /* 全螢幕爆光特效面版 */
         #flash-overlay {
             position: fixed;
             top:0; left:0; width:100vw; height:100vh;
@@ -429,7 +469,6 @@
             transition: opacity 0.1s ease;
         }
 
-        /* 響應式微調 */
         @media(max-width: 600px) {
             .game-wrapper { padding: 20px 15px; }
             .title-banner h1 { font-size: 1.8rem; }
@@ -438,7 +477,6 @@
             .media-controller { top: auto; bottom: 15px; right: 15px; }
         }
     </style>
-    <!-- 引入高質感字型與 YouTube Iframe API -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -448,22 +486,19 @@
     <canvas id="particles"></canvas>
     <div id="flash-overlay"></div>
 
-    <!-- 背景音樂播放器載體（必須包含 enablejsapi=1 以允許透過按鈕進行播放互動） -->
     <iframe id="yt-player-raw" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;" 
-            src="https://www.youtube.com/embed/wtHra9tFISY?enablejsapi=1&autoplay=0&controls=0&loop=1&playlist=wtHra9tFISY&rel=0" 
+            src="https://www.youtube.com/embed/E2vo0qvKGCM?enablejsapi=1&autoplay=0&controls=0&loop=1&playlist=E2vo0qvKGCM&rel=0" 
             frameborder="0" allow="autoplay"></iframe>
 
-    <!-- 影音控制組 -->
     <div class="media-controller">
         <button class="media-btn" id="mute-toggle-btn" onclick="toggleMute()">🔊</button>
         <input type="range" class="volume-slider" id="vol-ctrl" min="0" max="100" value="50" oninput="changeVolume(this.value)">
     </div>
 
-    <!-- 主選單視圖 -->
     <div class="game-wrapper active-view" id="view-home">
         <div class="title-banner">
             <h1>⚡ 哈利波特終極測驗</h1>
-            <p>50題巫師完整版資料庫</p>
+            <p>50題巫師完整 Pro Max 版資料庫</p>
         </div>
         <div class="btn-stack">
             <button class="magic-btn" onclick="switchView('view-setup')">開始測驗</button>
@@ -472,7 +507,6 @@
         </div>
     </div>
 
-    <!-- 填寫名稱視圖 -->
     <div class="game-wrapper" id="view-setup">
         <div class="title-banner">
             <h1>登錄魔法部</h1>
@@ -487,7 +521,6 @@
         </div>
     </div>
 
-    <!-- 核心問答視圖 -->
     <div class="game-wrapper" id="view-quiz">
         <div class="info-panel">
             <div id="hud-level-badge" class="badge-level">🔥 夯</div>
@@ -501,8 +534,8 @@
         <div class="quiz-body">
             <div id="question-box" class="question-text">載入題目中...</div>
             <div id="options-box" class="options-list">
-                <!-- 動態注入選項 -->
-            </div>
+                </div>
+            <button id="reparo-egg-btn" class="easter-egg-btn" onclick="triggerReparoMagic()">🪄 施展「復復修」消去法</button>
         </div>
 
         <div id="feedback-box" class="feedback-panel">
@@ -514,7 +547,6 @@
         </div>
     </div>
 
-    <!-- 結算總分視圖 -->
     <div class="game-wrapper" id="view-result">
         <div class="title-banner">
             <h1>測驗完成</h1>
@@ -531,7 +563,6 @@
         </div>
     </div>
 
-    <!-- 排行榜視圖 -->
     <div class="game-wrapper" id="view-rank">
         <div class="title-banner">
             <h1>🏆 魔法部名人堂</h1>
@@ -548,8 +579,7 @@
                     </tr>
                 </thead>
                 <tbody id="rank-table-body">
-                    <!-- 動態注入排行 -->
-                </tbody>
+                    </tbody>
             </table>
         </div>
         <div class="btn-stack" style="margin-top: 30px;">
@@ -566,7 +596,7 @@
             { q: "佛地魔的本名是什麼？", a: "蓋勒·葛林戴華德", b: "湯姆·魔佛羅·瑞斗", c: "魯休思·馬份", d: "巴提·柯羅奇", ans: "B", exp: "重組湯姆·魔佛羅·瑞斗（Tom Marvolo Riddle）的字母可得到「我是佛地魔」的宣告。" },
             { q: "哈利第一根魔杖核心是什麼？", a: "龍的心臟神經", b: "鳳凰羽毛", c: "獨角獸毛", d: "迷拉頭髮", ans: "B", exp: "哈利魔杖核心為佛克斯的鳳凰羽毛，與佛地魔的魔杖核心共生。" },
             { q: "霍格華茲魔法學校的校長阿不思·鄧不利多，全名中不包含以下哪一個名字？", a: "博知維", b: "沃夫林", c: "蓋勒", d: "布萊恩", ans: "C", exp: "他的全名為阿不思·博知維·沃夫林·布萊恩·鄧不利多，蓋勒是葛林戴華德的名字。" },
-            { q: "海格在哈利十一歲生日時送給他的貓頭鷹名叫什麼？", a: "朱頭", b: "嘿美", c: "克魯克山", d: "蘿莉絲夫人", ans: "B", exp: "嘿美（Hedwig）是哈利忠實的雪鴞，一路陪伴他直到最後大戰。" },
+            { q: "海格在哈利十一歲生日時送給他的貓頭鷹名叫什麼？（提示：本題有魔法彩蛋！）", a: "朱頭", b: "嘿美", c: "克魯克山", d: "蘿莉絲夫人", ans: "B", exp: "嘿美（Hedwig）是哈利忠實的雪鴞，一路陪伴他直到最後大戰。" },
             { q: "在《神祕的魔法石》中，保護魔法石的三頭巨犬被海格稱為什麼名字？", a: "尖牙", b: "毛毛", c: "路威", d: "諾伯", ans: "C", exp: "海格將其命名為「路威」（Fluffy），只要聽到音樂就會睡著。" },
             { q: "榮恩·衛斯理的長鼠斑斑，真實身份是哪一位食死人？", a: "彼得·佩迪魯", b: "天狼星·布萊克", c: "雷木思·路平", d: "巴提·柯羅奇二世", ans: "A", exp: "化鼠多年的阿尼馬格斯彼得·佩迪魯（蟲尾），是出賣哈利父母的叛徒。" },
             { q: "妙麗·格蘭傑利用什麼魔法道具，得以在三年級同時修讀多門課程？", a: "時光器", b: "儲思盆", c: "咆哮信", d: "熄燈器", ans: "A", exp: "麥教授破例向魔法部申請了時光器給妙麗，讓她能進行時間旅行修課。" },
@@ -579,14 +609,14 @@
             { q: "佛地魔的分靈體中，哪一個是赫夫帕夫的遺物？", a: "小金匣", b: "金杯", c: "王冕", d: "戒指", ans: "B", exp: "海加·赫夫帕夫的金杯被留傳下來，後被貝拉·雷斯壯存於古靈閣中。" },
             { q: "天狼星·布萊克在阿尼馬格斯狀態下會變成一隻什麼顏色的巨犬？", a: "白色", b: "灰色", c: "黑色", d: "棕色", ans: "C", exp: "天狼星的外號叫大腳板，變身後是一隻如同大腳黑狗般的巨犬。" },
             { q: "請問雷文克勞的創辦人遺留下來、具有增長智慧魔力的寶物是什麼？", a: "王冕", b: "寶劍", c: "掛飾", d: "復活石", ans: "A", exp: "羅威娜·雷文克勞的王冕藏於萬應室中，後被佛地魔改造成分靈體。" },
-            { q: "魔法世界中，古靈閣巫師銀行是由哪一種生物負責營運維護的？", a: "家庭小精靈", b: "妖精", c: "人馬", d: "巨人", ans: "B", exp: "妖精控制著古靈閣，並掌握著獨特的冶金魔法技術。" },
+            { q: "魔法世界中，古靈閣巫師銀行是由哪一種生物負責營運維護的？", a: "家庭小精靈", b: "妖精", d: "巨人", c: "人馬", ans: "B", exp: "妖精控制著古靈閣，並掌握著獨特的冶金魔法技術。" },
             { q: "賽佛勒斯·石內卜在擔任萬應室與史萊哲林導師之前，一直擔任什麼科目的教授？", a: "黑魔法防禦術", b: "藥草學", c: "魔藥學", d: "占卜學", ans: "C", exp: "石內卜多年擔任魔藥學教授，直到六年級才如願接任黑魔法防禦術。" },
             { q: "魔法部部長康尼留斯·夫子在對抗佛地魔崛起時，曾表現出極度的？", a: "英勇抗敵", b: "逃避不信", c: "直接投降", d: "退隱江湖", ans: "B", exp: "夫子因恐懼權力動搖，長期否認佛地魔復活的真相，並抹黑鄧不利多與哈利。" },
             { q: "哈利波特一入學便展現出高超飛行天賦，在魁地奇球隊中負責什麼位置？", a: "追蹤手", b: "看守手", c: "搜捕手", d: "打擊手", ans: "C", exp: "哈利擔任搜捕手（Seeker），負責在球場上尋找並捕捉金探子。" },
             { q: "九又四分之三月台位於倫敦的哪一個火車站內？", a: "國王十字車站", b: "維多利亞車站", c: "滑鐵盧車站", d: "聖潘克拉斯車站", ans: "A", exp: "巫師需穿越國王十字車站（King's Cross）第九與第十月台之間的磚牆屏障。" },
             { q: "妙麗的家長在麻瓜世界中是從事什麼職業的？", a: "律師", b: "牙醫", c: "大學教授", d: "工程師", ans: "B", exp: "格蘭傑夫婦在麻瓜社會均為執業牙醫，這讓巫師界對牙齒保健感到新奇。" },
             { q: "請問下列哪一種植物具有能緊緊纏繞並勒死受害者的特性，且懼怕陽光？", a: "曼德拉草", b: "毒觸手", c: "魔鬼網", d: "渾拼柳", ans: "C", exp: "魔鬼網（Devil's Snare）會緊縛獵物，妙麗利用魔法火焰產生的強光擊退它。" },
-            { q: "鄧不利多軍隊（D.A.）在五年級時是為了對抗哪一位教授的獨裁統治而建立的？", a: "奎若教授", b: "桃樂絲·恩不里居", c: "吉德羅·洛哈", d: "阿拉特·穆敵", ans: "B", exp: "恩不里居限制實作魔法，哈利在妙麗提議下組織了非法防禦術學習會。" },
+            { q: "鄧不利多的軍隊（D.A.）在五年級時是為了對抗哪一位教授的獨裁統治而建立的？", a: "奎若教授", b: "桃樂絲·恩不里居", c: "吉德羅·洛哈", d: "阿拉特·穆敵", ans: "B", exp: "恩不里居限制實作魔法，哈利在妙麗提議下組織了非法防禦術學習會。" },
             { q: "哈利第一把獲得的頂級飛天掃帚是？", a: "狂風七號", b: "光輪2000", c: "火閃電", d: "彗星260", ans: "B", exp: "麥教授破格錄取哈利進球隊後，秘密贈送了他一把當時最快的光輪2000。" },
             { q: "死神的三件聖物分別為：接骨木魔杖、復活石以及什麼？", a: "隱形斗篷", b: "魔法石", c: "劫盜地圖", d: "寶劍", ans: "A", exp: "死神聖物三件套包含了隱形斗篷，是由皮福雷三兄弟流傳下來的聖物。" },
             { q: "在《混血王子的背叛》中，石內卜教授吩咐哈利去查閱誰留下來的魔藥學課本？", a: "詹姆·波特", b: "混血王子", c: "莉莉·伊凡", d: "斯拉格霍恩", ans: "B", exp: "哈利拿到了署名為「混血王子」（石內卜筆名）的舊課本，從而獲得許多獨門秘笈。" },
@@ -611,7 +641,7 @@
             { q: "請問佛地魔寄宿在哈利體內的靈魂碎片，是在哪一個事件中被佛地魔親手摧毀的？", a: "密室被蛇妖咬傷", b: "禁忌森林索命咒對決", c: "神祕部門大戰", d: "火盃大賽復活夜", ans: "B", exp: "佛地魔在禁忌森林用接骨木魔杖對哈利施展索命咒，正好殺死了自己依附在哈利身上的靈魂碎片。" },
             { q: "尼樂·勒梅是魔法世界中唯一已知的什麼製造者？", a: "魔法石", b: "万应室", c: "隱形斗篷", d: "時光器", ans: "A", exp: "煉金術士尼樂·勒梅成功製造出魔法石，能點石成金並提煉長生不老藥。" },
             { q: "雷文克勞學院的幽靈「灰衣貴婦」，真實姓名是什麼？", a: "胖女士", b: "海蓮娜·雷文克勞", c: "血腥男爵", d: "Helena Potter", ans: "B", exp: "灰衣貴婦是海蓮娜·雷文克勞，因偷走母親的王冕而逃亡，後被血腥男爵所殺。" },
-            { q: "在全書的結尾，哈利波特的長子被命名為什麼名字？", a: "詹姆·天狼星·波特", b: "阿不思·賽佛勒斯·波特", c: "莉莉·露娜·波特", d: "弗雷·波特", ans: "B", exp: "哈利以兩位霍格華茲偉大校長的名字命名次子（小說結局主要聚焦之角色），而長子則名為詹姆·天狼星·波特。" }
+            { q: "在全書的結尾，哈利波特的長子被命名為什麼名字？", a: "詹姆·天狼星·波特", b: "阿不思·賽佛勒斯·波特", c: "莉莉·露娜·波特", d: "弗雷·波特", ans: "B", exp: "哈利以兩位霍格華茲偉大校長的名字命名次子，而長子則名為詹姆·天狼星·波特。" }
         ];
 
         // ==========================================
@@ -647,6 +677,15 @@
             osc.stop(now + 0.4);
         }
 
+        // 施展彩蛋魔法時的特殊音效
+        function playEggMagicSound() {
+            if(isMuted) return;
+            const now = AudioCtx.currentTime;
+            for(let i=0; i<6; i++) {
+                createOscillator(600 + (i * 150), now + (i * 0.05), 0.2);
+            }
+        }
+
         function createOscillator(freq, startTime, duration) {
             const osc = AudioCtx.createOscillator();
             const gain = AudioCtx.createGain();
@@ -661,11 +700,10 @@
         }
 
         // ==========================================
-        // 3. YouTube 嵌入音樂控制器 (修正強效控制版)
+        // 3. YouTube 嵌入音樂控制器 (對應指定歌曲)
         // ==========================================
         let ytPlayer = null;
         
-        // 載入 YouTube API 腳本
         const tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         const firstScriptTag = document.getElementsByTagName('script')[0];
@@ -687,7 +725,6 @@
             if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
                 ytPlayer.playVideo();
             } else {
-                // 如果API尚未準備完全，使用 postMessage 直接向 iframe 發送直接指令
                 const iframe = document.getElementById('yt-player-raw');
                 if (iframe && iframe.contentWindow) {
                     iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
@@ -742,7 +779,6 @@
             const target = document.getElementById(viewId);
             target.classList.add('active-view');
             
-            // 觸發 Web Audio API 激活鎖
             if(AudioCtx.state === 'suspended') {
                 AudioCtx.resume();
             }
@@ -756,17 +792,15 @@
             }
             registeredPlayerName = inputName;
             
-            // 【核心修正】在使用者明確點擊按鈕的第一時間，同時喚醒 Web Audio 與 播放 YouTube 串流
+            // 強制喚醒 Web Audio API 並播放新替換的 YouTube 魔法曲
             if(AudioCtx.state === 'suspended') {
                 AudioCtx.resume();
             }
             startMusicPlayback();
             
-            // 狀態歸零
             currentQuizIndex = 0;
             userCurrentScore = 0;
             
-            // 載入第一題
             renderQuestionStructure();
             switchView('view-quiz');
         }
@@ -792,6 +826,14 @@
 
             document.getElementById('question-box').innerText = `【${currentQuizIndex + 1}】${quizItem.q}`;
             
+            // 【核心彩蛋判斷】如果是第 5 題（索引為 4），顯示消去法按鈕
+            const eggBtn = document.getElementById('repar-egg-btn') || document.getElementById('reparo-egg-btn');
+            if (currentQuizIndex === 4) {
+                eggBtn.style.display = 'block';
+            } else {
+                eggBtn.style.display = 'none';
+            }
+
             const optBox = document.getElementById('options-box');
             optBox.innerHTML = '';
             
@@ -805,6 +847,8 @@
             arrOpts.forEach(opt => {
                 const div = document.createElement('div');
                 div.className = "option-item";
+                // 給予一個自訂屬性以便彩蛋函數辨識正確/錯誤答案
+                div.setAttribute('data-key', opt.key);
                 div.innerHTML = `<strong>${opt.key}：</strong>&nbsp;${opt.text}`;
                 div.onclick = () => evaluateUserAnswer(opt.key, div);
                 optBox.appendChild(div);
@@ -813,10 +857,46 @@
             document.getElementById('feedback-box').style.display = 'none';
         }
 
+        // 【新追加】第 5 題限定的「復復修」消去法彩蛋
+        function triggerReparoMagic() {
+            const currentQuestion = quizDatabase[currentQuizIndex];
+            const allOptionElements = document.querySelectorAll('.option-item');
+            const eggBtn = document.getElementById('reparo-egg-btn');
+            
+            // 找出所有錯誤的答案節點
+            let wrongElements = [];
+            allOptionElements.forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (key !== currentQuestion.ans) {
+                    wrongElements.push(el);
+                }
+            });
+
+            // 隨機打亂錯誤答案排序，並挑選其中兩個進行「擦除」
+            wrongElements.sort(() => Math.random() - 0.5);
+            
+            // 抹除前兩個錯誤選項
+            if (wrongElements[0]) wrongElements[0].classList.add('erased');
+            if (wrongElements[1]) wrongElements[1].classList.add('erased');
+
+            // 播放炫麗魔法聲效與閃爍特效
+            playEggMagicSound();
+            const flashOverlay = document.getElementById('flash-overlay');
+            flashOverlay.style.background = "rgba(255, 215, 0, 0.3)";
+            flashOverlay.style.opacity = "1";
+            setTimeout(() => { flashOverlay.style.opacity = "0"; }, 300);
+
+            // 施展完後隱藏按鈕
+            eggBtn.style.display = 'none';
+        }
+
         function evaluateUserAnswer(chosenKey, elementToken) {
             const currentQuestion = quizDatabase[currentQuizIndex];
             const allOptionElements = document.querySelectorAll('.option-item');
             
+            // 隱藏彩蛋按鈕，防止答完還去點擊
+            document.getElementById('reparo-egg-btn').style.display = 'none';
+
             allOptionElements.forEach(el => el.classList.add('disabled'));
 
             const feedbackAlert = document.getElementById('feedback-alert');
@@ -826,7 +906,7 @@
             if(chosenKey === currentQuestion.ans) {
                 userCurrentScore++;
                 elementToken.classList.add('correct');
-                feedbackAlert.innerText = "✓ 正確！";
+                feedbackAlert.innerText = "✓ 正確！魔法力量與你同在！";
                 feedbackAlert.className = "feedback-status is-correct";
                 playMagicToneSuccess();
 
@@ -836,12 +916,12 @@
 
             } else {
                 elementToken.classList.add('wrong');
-                feedbackAlert.innerText = "✗ 答錯！";
+                feedbackAlert.innerText = "✗ 答錯！魔杖似乎揮錯了方向...";
                 feedbackAlert.className = "feedback-status is-wrong";
                 playMagicToneFailure();
 
                 allOptionElements.forEach(el => {
-                    if(el.innerText.startsWith(currentQuestion.ans)) {
+                    if(el.getAttribute('data-key') === currentQuestion.ans) {
                         el.classList.add('correct');
                     }
                 });
