@@ -438,6 +438,7 @@
             .media-controller { top: auto; bottom: 15px; right: 15px; }
         }
     </style>
+    <!-- 引入高質感字型與 YouTube Iframe API -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -447,13 +448,18 @@
     <canvas id="particles"></canvas>
     <div id="flash-overlay"></div>
 
-    <div id="yt-player-raw" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;"></div>
+    <!-- 背景音樂播放器載體（必須包含 enablejsapi=1 以允許透過按鈕進行播放互動） -->
+    <iframe id="yt-player-raw" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;" 
+            src="https://www.youtube.com/embed/wtHra9tFISY?enablejsapi=1&autoplay=0&controls=0&loop=1&playlist=wtHra9tFISY&rel=0" 
+            frameborder="0" allow="autoplay"></iframe>
 
+    <!-- 影音控制組 -->
     <div class="media-controller">
         <button class="media-btn" id="mute-toggle-btn" onclick="toggleMute()">🔊</button>
         <input type="range" class="volume-slider" id="vol-ctrl" min="0" max="100" value="50" oninput="changeVolume(this.value)">
     </div>
 
+    <!-- 主選單視圖 -->
     <div class="game-wrapper active-view" id="view-home">
         <div class="title-banner">
             <h1>⚡ 哈利波特終極測驗</h1>
@@ -466,6 +472,7 @@
         </div>
     </div>
 
+    <!-- 填寫名稱視圖 -->
     <div class="game-wrapper" id="view-setup">
         <div class="title-banner">
             <h1>登錄魔法部</h1>
@@ -474,33 +481,13 @@
         <div style="margin-top: 40px;">
             <input type="text" id="player-name-input" class="input-magic" placeholder="輸入您的巫師名稱..." maxlength="12">
             <div class="btn-stack">
-                <button class="magic-btn" onclick="initiateQuizGame(function initiateQuizGame() {
-            const inputName = document.getElementById('player-name-input').value.trim();
-            if(!inputName) {
-                alert("請輸入巫師名諱以通過魔法部屏障！");
-                return;
-            }
-            registeredPlayerName = inputName;
-            
-            // 【修正關鍵】在這裡強制喚醒 Web Audio API，並重新命令 YouTube 播放器播放音樂
-            if(AudioCtx.state === 'suspended') {
-                AudioCtx.resume();
-            }
-            startMusicPlayback();
-            
-            // 狀態歸零
-            currentQuizIndex = 0;
-            userCurrentScore = 0;
-            
-            // 載入第一題
-            renderQuestionStructure();
-            switchView('view-quiz');
-        })">進入霍格華茲</button>
+                <button class="magic-btn" onclick="initiateQuizGame()">進入霍格華茲</button>
                 <button class="magic-btn" style="border-color:#7f8c8d; color:#bdc3c7;" onclick="switchView('view-home')">返回主選單</button>
             </div>
         </div>
     </div>
 
+    <!-- 核心問答視圖 -->
     <div class="game-wrapper" id="view-quiz">
         <div class="info-panel">
             <div id="hud-level-badge" class="badge-level">🔥 夯</div>
@@ -514,7 +501,8 @@
         <div class="quiz-body">
             <div id="question-box" class="question-text">載入題目中...</div>
             <div id="options-box" class="options-list">
-                </div>
+                <!-- 動態注入選項 -->
+            </div>
         </div>
 
         <div id="feedback-box" class="feedback-panel">
@@ -526,6 +514,7 @@
         </div>
     </div>
 
+    <!-- 結算總分視圖 -->
     <div class="game-wrapper" id="view-result">
         <div class="title-banner">
             <h1>測驗完成</h1>
@@ -542,6 +531,7 @@
         </div>
     </div>
 
+    <!-- 排行榜視圖 -->
     <div class="game-wrapper" id="view-rank">
         <div class="title-banner">
             <h1>🏆 魔法部名人堂</h1>
@@ -558,7 +548,8 @@
                     </tr>
                 </thead>
                 <tbody id="rank-table-body">
-                    </tbody>
+                    <!-- 動態注入排行 -->
+                </tbody>
             </table>
         </div>
         <div class="btn-stack" style="margin-top: 30px;">
@@ -584,7 +575,7 @@
             { q: "請問開啟密室的繼承人必備的語言天賦稱之為？", a: "爬說語", b: "人魚語", c: "妖精語", d: "巨怪語", ans: "A", exp: "爬說語（Parseltongue）是與蛇溝通的語言，為薩拉札·史萊哲林一脈的特徵。" },
             { q: "雷文克勞學院的創辦人是誰？", a: "羅威娜·雷文克勞", b: "海蓮娜·雷文克勞", c: "碧雅翠絲·波特", d: "葛帝林·雷文克勞", ans: "A", exp: "羅威娜·雷文克勞是創辦人，海蓮娜是其女兒（即灰衣貴婦）。" },
             { q: "雷木思·路平教授是一位遭受詛咒的？", a: "吸血鬼", b: "狼人", c: "報喪女妖", d: "惡魔", ans: "B", exp: "路平幼年被焚銳·灰背咬傷從此成為狼人，需定期服用渾拼柳與縛狼汁。" },
-            { q: "在《阿茲卡班的逃犯》中，哈利在騎士公車上使用了哪一個假名？", a: "榮恩·衛斯理", b: "內維爾·隆巴頓", c: "威爾·達利", d: "迪哥里", ans: "C", exp: "哈利為了掩人耳目，對車掌史坦·桑派聲稱自己叫做威爾·達利（Neville Longbottom在英文中亦曾被用作掩護，但中文官方採用威爾·達利）。" },
+            { q: "在《阿茲卡班的逃犯》中，哈利在騎士公車上使用了哪一個假名？", a: "榮恩·衛斯理", b: "內維爾·隆巴頓", c: "威爾·達利", d: "迪哥里", ans: "C", exp: "哈利為了掩人耳目，對車掌史坦·桑派聲稱自己叫做威爾·達利。" },
             { q: "佛地魔的分靈體中，哪一個是赫夫帕夫的遺物？", a: "小金匣", b: "金杯", c: "王冕", d: "戒指", ans: "B", exp: "海加·赫夫帕夫的金杯被留傳下來，後被貝拉·雷斯壯存於古靈閣中。" },
             { q: "天狼星·布萊克在阿尼馬格斯狀態下會變成一隻什麼顏色的巨犬？", a: "白色", b: "灰色", c: "黑色", d: "棕色", ans: "C", exp: "天狼星的外號叫大腳板，變身後是一隻如同大腳黑狗般的巨犬。" },
             { q: "請問雷文克勞的創辦人遺留下來、具有增長智慧魔力的寶物是什麼？", a: "王冕", b: "寶劍", c: "掛飾", d: "復活石", ans: "A", exp: "羅威娜·雷文克勞的王冕藏於萬應室中，後被佛地魔改造成分靈體。" },
@@ -601,7 +592,7 @@
             { q: "在《混血王子的背叛》中，石內卜教授吩咐哈利去查閱誰留下來的魔藥學課本？", a: "詹姆·波特", b: "混血王子", c: "莉莉·伊凡", d: "斯拉格霍恩", ans: "B", exp: "哈利拿到了署名為「混血王子」（石內卜筆名）的舊課本，從而獲得許多獨門秘笈。" },
             { q: "赫夫帕夫學院的代表顏色是什麼？", a: "藍與青銅", b: "黃與黑", c: "綠與銀", d: "紅與金", ans: "B", exp: "赫夫帕夫採用黃色與黑色為代表色，象徵著泥土、勤奮與忠誠。" },
             { q: "請問衛斯理家會飛的魔法汽車是什麼車款？", a: "福特安格利亞 (Ford Anglia)", b: "勞斯萊斯", c: "賓士", d: "福斯金龜車", ans: "A", exp: "亞瑟·衛斯理改造了一輛福特安格利亞藍色汽車，具有隱形與飛行的能力。" },
-            { q: "魔法世界中，能讓人產生極致好運的魔藥被稱為什麼？", a: "迷幻藥", b: "福靈劑", c: "變身水", d: "吐真劑", ans: "B", exp: "福靈劑（Felix Felicis）又稱幸運水，飲用後在一段時間內做任何事都會成功。" },
+            { q: "魔法世界中，能讓人產生極致好運的魔藥被稱疑問？", a: "迷幻藥", b: "福靈劑", c: "變身水", d: "吐真劑", ans: "B", exp: "福靈劑（Felix Felicis）又稱幸運水，飲用後在一段時間內做任何事都會成功。" },
             { q: "哈利波特額頭上的疤痕是什麼形狀？", a: "閃電狀", b: "星星狀", c: "魔杖狀", d: "圓圈狀", ans: "A", exp: "佛地魔對哈利施展索命咒遭反彈，在哈利額頭上留下一道蘊含靈魂碎片的閃電疤痕。" },
             { q: "鄧不利多的鳳凰叫做什麼名字？", a: "諾伯", b: "佛克斯", c: "巴嘴", d: "阿辣哥", ans: "B", exp: "鳳凰佛克斯（Fawkes）多次拯救哈利，並在鄧不利多去世後高唱輓歌離去。" },
             { q: "巫師要前往魔法部，在麻瓜倫敦街道上的公共電話亭應撥打什麼號碼？", a: "911", b: "62442", c: "999", d: "007", ans: "B", exp: "撥打「62442」代表拼出字母「MAGIC」（魔法），即可啟動訪客電梯。" },
@@ -618,8 +609,8 @@
             { q: "哈利父母在戈德里克山谷的保密人原本是天狼星，後來偷偷換成了誰？", a: "盧平", b: "彼得·佩迪魯", c: "石內卜", d: "鄧不利多", ans: "B", exp: "天狼星認為自己目標太大，建議換成不起眼的蟲尾彼得，卻未料遭到背叛。" },
             { q: "妙麗格蘭傑的魔法護法是一隻什麼動物？", a: "貓", b: "水獺", c: "兔子", d: "狐狸", ans: "B", exp: "妙麗的護法是一隻水獺（Otter），代表著靈巧、聰慧與活力。" },
             { q: "請問佛地魔寄宿在哈利體內的靈魂碎片，是在哪一個事件中被佛地魔親手摧毀的？", a: "密室被蛇妖咬傷", b: "禁忌森林索命咒對決", c: "神祕部門大戰", d: "火盃大賽復活夜", ans: "B", exp: "佛地魔在禁忌森林用接骨木魔杖對哈利施展索命咒，正好殺死了自己依附在哈利身上的靈魂碎片。" },
-            { q: "尼樂·勒梅是魔法世界中唯一已知的什麼製造者？", a: "魔法石 (Philosopher's Stone)", b: "萬應室", c: "隱形斗篷", d: "時光器", ans: "A", exp: "煉金術士尼樂·勒梅成功製造出魔法石，能點石成金並提煉長生不老藥。" },
-            { q: "雷文克勞學院的幽靈「灰衣貴婦」，真實姓名是什麼？", a: "胖女士", b: "海蓮娜·雷文克勞", c: "血腥男爵", d: " Helena Potter", ans: "B", exp: "灰衣貴婦是海蓮娜·雷文克勞，因偷走母親的王冕而逃亡，後被血腥男爵所殺。" },
+            { q: "尼樂·勒梅是魔法世界中唯一已知的什麼製造者？", a: "魔法石", b: "万应室", c: "隱形斗篷", d: "時光器", ans: "A", exp: "煉金術士尼樂·勒梅成功製造出魔法石，能點石成金並提煉長生不老藥。" },
+            { q: "雷文克勞學院的幽靈「灰衣貴婦」，真實姓名是什麼？", a: "胖女士", b: "海蓮娜·雷文克勞", c: "血腥男爵", d: "Helena Potter", ans: "B", exp: "灰衣貴婦是海蓮娜·雷文克勞，因偷走母親的王冕而逃亡，後被血腥男爵所殺。" },
             { q: "在全書的結尾，哈利波特的長子被命名為什麼名字？", a: "詹姆·天狼星·波特", b: "阿不思·賽佛勒斯·波特", c: "莉莉·露娜·波特", d: "弗雷·波特", ans: "B", exp: "哈利以兩位霍格華茲偉大校長的名字命名次子（小說結局主要聚焦之角色），而長子則名為詹姆·天狼星·波特。" }
         ];
 
@@ -633,18 +624,14 @@
         function playMagicToneSuccess() {
             if(isMuted) return;
             const now = AudioCtx.currentTime;
-            
-            // 雙音階和弦 - 清脆魔法感
-            createOscillator(523.25, now, 0.15); // C5
-            createOscillator(659.25, now + 0.08, 0.15); // E5
-            createOscillator(783.99, now + 0.15, 0.25); // G5
+            createOscillator(523.25, now, 0.15); 
+            createOscillator(659.25, now + 0.08, 0.15); 
+            createOscillator(783.99, now + 0.15, 0.25); 
         }
 
         function playMagicToneFailure() {
             if(isMuted) return;
             const now = AudioCtx.currentTime;
-            
-            // 降音階滑音 - 低沉失敗感
             const osc = AudioCtx.createOscillator();
             const gain = AudioCtx.createGain();
             osc.type = 'sawtooth';
@@ -674,11 +661,11 @@
         }
 
         // ==========================================
-        // 3. YouTube 嵌入音樂控制器
+        // 3. YouTube 嵌入音樂控制器 (修正強效控制版)
         // ==========================================
         let ytPlayer = null;
         
-        // 載入 YouTube API
+        // 載入 YouTube API 腳本
         const tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         const firstScriptTag = document.getElementsByTagName('script')[0];
@@ -686,14 +673,6 @@
 
         function onYouTubeIframeAPIReady() {
             ytPlayer = new YT.Player('yt-player-raw', {
-                videoId: 'wtHra9tFISY',
-                playerVars: {
-                    'autoplay': 0,
-                    'controls': 0,
-                    'loop': 1,
-                    'playlist': 'wtHra9tFISY',
-                    'rel': 0
-                },
                 events: {
                     'onReady': onPlayerReady
                 }
@@ -707,6 +686,12 @@
         function startMusicPlayback() {
             if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
                 ytPlayer.playVideo();
+            } else {
+                // 如果API尚未準備完全，使用 postMessage 直接向 iframe 發送直接指令
+                const iframe = document.getElementById('yt-player-raw');
+                if (iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                }
             }
         }
 
@@ -714,18 +699,32 @@
             globalVolume = value / 100;
             if(ytPlayer && typeof ytPlayer.setVolume === 'function') {
                 ytPlayer.setVolume(value);
+            } else {
+                const iframe = document.getElementById('yt-player-raw');
+                if (iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage(JSON.stringify({"event":"command","func":"setVolume","args":[value]}), '*');
+                }
             }
         }
 
         function toggleMute() {
             isMuted = !isMuted;
             const btn = document.getElementById('mute-toggle-btn');
+            const iframe = document.getElementById('yt-player-raw');
             if(isMuted) {
                 btn.innerText = "❌";
-                if(ytPlayer && typeof ytPlayer.mute === 'function') ytPlayer.mute();
+                if(ytPlayer && typeof ytPlayer.mute === 'function') {
+                    ytPlayer.mute();
+                } else if(iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+                }
             } else {
                 btn.innerText = "🔊";
-                if(ytPlayer && typeof ytPlayer.unMute === 'function') ytPlayer.unMute();
+                if(ytPlayer && typeof ytPlayer.unMute === 'function') {
+                    ytPlayer.unMute();
+                } else if(iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+                }
             }
         }
 
@@ -737,11 +736,9 @@
         let registeredPlayerName = "無名巫師";
 
         function switchView(viewId) {
-            // 隱藏所有視窗
             document.querySelectorAll('.game-wrapper').forEach(view => {
                 view.classList.remove('active-view');
             });
-            // 喚醒目標視窗
             const target = document.getElementById(viewId);
             target.classList.add('active-view');
             
@@ -759,7 +756,10 @@
             }
             registeredPlayerName = inputName;
             
-            // 開播音樂
+            // 【核心修正】在使用者明確點擊按鈕的第一時間，同時喚醒 Web Audio 與 播放 YouTube 串流
+            if(AudioCtx.state === 'suspended') {
+                AudioCtx.resume();
+            }
             startMusicPlayback();
             
             // 狀態歸零
@@ -772,7 +772,7 @@
         }
 
         function getLevelTierLabel(index) {
-            const num = index + 1; // 1-based
+            const num = index + 1; 
             if(num <= 10) return "🔥 夯";
             if(num <= 20) return "👑 頂級";
             if(num <= 30) return "💪 人上人";
@@ -783,19 +783,15 @@
         function renderQuestionStructure() {
             const quizItem = quizDatabase[currentQuizIndex];
             
-            // 更新 HUD 元件資訊
             document.getElementById('hud-level-badge').innerText = getLevelTierLabel(currentQuizIndex);
             document.getElementById('hud-score-counter').innerText = userCurrentScore;
             document.getElementById('hud-index-counter').innerText = currentQuizIndex + 1;
             
-            // 更新進度條
             const percent = ((currentQuizIndex + 1) / 50) * 100;
             document.getElementById('quiz-progress-inner').style.width = percent + "%";
 
-            // 塞入題幹
             document.getElementById('question-box').innerText = `【${currentQuizIndex + 1}】${quizItem.q}`;
             
-            // 清理並生成選項
             const optBox = document.getElementById('options-box');
             optBox.innerHTML = '';
             
@@ -814,7 +810,6 @@
                 optBox.appendChild(div);
             });
 
-            // 收回反饋面板
             document.getElementById('feedback-box').style.display = 'none';
         }
 
@@ -822,7 +817,6 @@
             const currentQuestion = quizDatabase[currentQuizIndex];
             const allOptionElements = document.querySelectorAll('.option-item');
             
-            // 鎖定全部選項避免重選
             allOptionElements.forEach(el => el.classList.add('disabled'));
 
             const feedbackAlert = document.getElementById('feedback-alert');
@@ -830,33 +824,28 @@
             const quizCard = document.getElementById('view-quiz');
 
             if(chosenKey === currentQuestion.ans) {
-                // 答對邏輯
                 userCurrentScore++;
                 elementToken.classList.add('correct');
                 feedbackAlert.innerText = "✓ 正確！";
                 feedbackAlert.className = "feedback-status is-correct";
                 playMagicToneSuccess();
 
-                // 綠色全螢幕瞬間爆光特效
                 flashOverlay.style.background = "rgba(46, 204, 113, 0.4)";
                 flashOverlay.style.opacity = "1";
                 setTimeout(() => { flashOverlay.style.opacity = "0"; }, 200);
 
             } else {
-                // 答錯邏輯
                 elementToken.classList.add('wrong');
                 feedbackAlert.innerText = "✗ 答錯！";
                 feedbackAlert.className = "feedback-status is-wrong";
                 playMagicToneFailure();
 
-                // 亮出正確答案給玩家看
                 allOptionElements.forEach(el => {
                     if(el.innerText.startsWith(currentQuestion.ans)) {
                         el.classList.add('correct');
                     }
                 });
 
-                // 紅色全螢幕瞬間爆光與卡片震動特效
                 flashOverlay.style.background = "rgba(231, 76, 60, 0.4)";
                 flashOverlay.style.opacity = "1";
                 setTimeout(() => { flashOverlay.style.opacity = "0"; }, 200);
@@ -865,10 +854,7 @@
                 setTimeout(() => { quizCard.classList.remove('shake-effect'); }, 400);
             }
 
-            // 更新即時得分 HUD
             document.getElementById('hud-score-counter').innerText = userCurrentScore;
-
-            // 填寫解析內容並呈現
             document.getElementById('explanation-box').innerText = `正確答案：【${currentQuestion.ans}】。${currentQuestion.exp}`;
             document.getElementById('feedback-box').style.display = 'block';
         }
@@ -885,7 +871,6 @@
         function concludeQuizSession() {
             document.getElementById('final-score-num').innerText = userCurrentScore;
             
-            // 依分數分發稱號
             let titleRank = "";
             if(userCurrentScore >= 45) titleRank = "🏆 霍格華茲傳奇";
             else if(userCurrentScore >= 35) titleRank = "⚡ 魁地奇明星";
@@ -894,10 +879,7 @@
             else titleRank = "🐀 爆角怪飼養員";
 
             document.getElementById('final-rank-badge').innerText = `評定稱號：${titleRank}`;
-            
-            // 寫入排行榜快取
             commitScoreToStorage(registeredPlayerName, userCurrentScore);
-            
             switchView('view-result');
         }
 
@@ -909,12 +891,9 @@
             const timestamp = new Date().toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' });
             
             records.push({ name: name, score: score, date: timestamp });
-            // 排序：高分在前、新日前在前
             records.sort((a, b) => b.score - a.score);
             
-            // 只保留前十名
             if(records.length > 10) records = records.slice(0, 10);
-            
             localStorage.setItem('hogwarts_ranks', JSON.stringify(records));
         }
 
