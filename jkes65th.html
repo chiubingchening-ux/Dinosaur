@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>建功國小六年五班畢業倒數</title>
+    <style>
+        /* 全域變數定義：支援淺色與深色模式 */
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #333333;
+            --card-bg: #ffffff;
+            --accent-color: #4a90e2;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1e1e2d;
+            --text-color: #f5f5f5;
+            --card-bg: #2d2d3f;
+            --accent-color: #ff7675;
+            --shadow: rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* 右上角導覽列 */
+        .top-nav {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            background-color: var(--accent-color);
+            color: white;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .user-status {
+            font-size: 0.95rem;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 6px 12px;
+            border-radius: 15px;
+        }
+
+        [data-theme="dark"] .user-status {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 主要內容卡片 */
+        .container {
+            text-align: center;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px var(--shadow);
+            max-width: 650px;
+            width: 90%;
+            transition: background-color 0.3s;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        /* 時間計時器樣式 */
+        .timer {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            background: rgba(0,0,0,0.05);
+            padding: 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        [data-theme="dark"] .timer {
+            background: rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 右上角控制區 -->
+    <div class="top-nav">
+        <span id="user-display" class="user-status"></span>
+        <button id="btn-theme" onclick="tryToggleTheme()">深色模式</button>
+        <button id="btn-lang" onclick="tryToggleLang()">English</button>
+    </div>
+
+    <!-- 主要倒數區 -->
+    <div class="container">
+        <h1 id="title-text">正在載入中...</h1>
+        <div id="countdown" class="timer"></div>
+    </div>
+
+    <script>
+        // 目標畢業時間：2026年6月11日 00:00:00
+        const targetDate = new Date("2026-06-11T00:00:00").getTime();
+
+        // 預設已註冊名單（利用 localStorage 儲存，重新整理網頁資料不會消失）
+        let studentList = JSON.parse(localStorage.getItem('studentList')) || {
+            "6501": { zh: "小明", en: "Xiao Ming" } // 預留一個範例
+        };
+
+        // 網頁狀態
+        let currentTheme = "light";
+        let currentLang = "zh";
+        let currentUser = null; // 儲存當前登入的座號
+
+        // 語系文字包
+        const i18n = {
+            zh: {
+                initPrompt: "【歡迎進入畢業倒數網站】\n請輸入您的四位數座號 (例如: 6501)：",
+                regZhPrompt: "偵測到新座號！請輸入您的「中文姓名」：",
+                regEnPrompt: "請輸入您的「英文姓名」：",
+                invalidCode: "輸入格式錯誤！請輸入4位數數字 (例如 6501)。",
+                invalidName: "姓名不能留空，請重新整理網頁並正確填寫！",
+                themeLight: "淺色模式",
+                themeDark: "深色模式",
+                beforeTitle: "距離建功國小六年五班畢業還有",
+                afterTitle: "六年五班畢業已經",
+                beforeUser: "跑我們一起倒數",
+                afterUser: "個人陪我們過了畢業",
+                year: "年", month: "月", day: "日", hr: "時", min: "分", sec: "秒"
+            },
+            en: {
+                initPrompt: "[Welcome] Please enter your 4-digit seat number (e.g., 6501):",
+                regZhPrompt: "New user detected! Please enter your Chinese name:",
+                regEnPrompt: "Please enter your English name:",
+                invalidCode: "Invalid format! Please enter a 4-digit number (e.g., 6505).",
+                invalidName: "Name cannot be empty. Please refresh and try again!",
+                themeLight: "Light Mode",
+                themeDark: "Dark Mode",
+                beforeTitle: "Time left until Jiangong Elementary School Class 605 Graduation:",
+                afterTitle: "Class 605 has graduated for:",
+                beforeUser: "is counting down with us",
+                afterUser: "people spent graduation with us",
+                year: "Y ", month: "M ", day: "D ", hr: "H ", min: "M ", sec: "S"
+            }
+        };
+
+        // 強制進網站就要填寫/登入/註冊的流程
+        function forceLogin() {
+            while (!currentUser) {
+                let code = prompt(i18n[currentLang].initPrompt);
+                
+                // 檢查是否取消或沒輸入
+                if (code === null || code.trim() === "") {
+                    alert(i18n[currentLang].invalidCode);
+                    continue;
+                }
+                
+                code = code.trim();
+                // 驗證是否為4位數字
+                const codeRegex = /^\d{4}$/;
+                if (!codeRegex.test(code)) {
+                    alert(i18n[currentLang].invalidCode);
+                    continue;
+                }
+
+                // 如果存在，直接登入
+                if (studentList[code]) {
+                    currentUser = code;
+                } else {
+                    // 如果不存在，啟動直接註冊流程
+                    let nameZh = prompt(i18n[currentLang].regZhPrompt);
+                    if (!nameZh || nameZh.trim() === "") {
+                        alert(i18n[currentLang].invalidName);
+                        window.location.reload();
+                        return;
+                    }
+                    
+                    let nameEn = prompt(i18n[currentLang].regEnPrompt);
+                    if (!nameEn || nameEn.trim() === "") {
+                        alert(i18n[currentLang].invalidName);
+                        window.location.reload();
+                        return;
+                    }
+
+                    // 寫入名單並存進瀏覽器快取
+                    studentList[code] = {
+                        zh: nameZh.trim(),
+                        en: nameEn.trim()
+                    };
+                    localStorage.setItem('studentList', JSON.stringify(studentList));
+                    currentUser = code;
+                }
+            }
+            // 登入成功後更新畫面上方欄位
+            updateUserDisplay();
+        }
+
+        // 切換主題
+        function tryToggleTheme() {
+            currentTheme = currentTheme === "light" ? "dark" : "light";
+            document.documentElement.setAttribute("data-theme", currentTheme);
+            
+            const btnTheme = document.getElementById("btn-theme");
+            btnTheme.innerText = currentTheme === "light" ? i18n[currentLang].themeDark : i18n[currentLang].themeLight;
+        }
+
+        // 切換語言
+        function tryToggleLang() {
+            currentLang = currentLang === "zh" ? "en" : "zh";
+            
+            // 更新按鈕與介面文字
+            document.getElementById("btn-lang").innerText = currentLang === "zh" ? "English" : "中文";
+            document.getElementById("btn-theme").innerText = currentTheme === "light" ? i18n[currentLang].themeDark : i18n[currentLang].themeLight;
+            
+            updateUserDisplay();
+            updateTimer();
+        }
+
+        // 更新右上角姓名與狀態
+        function updateUserDisplay() {
+            const userDisplay = document.getElementById("user-display");
+            if (!currentUser) return;
+
+            const now = new Date().getTime();
+            const name = studentList[currentUser][currentLang];
+            
+            if (now < targetDate) {
+                // 畢業前：誰跑我們一起倒數
+                userDisplay.innerText = `${name} ${i18n[currentLang].beforeUser}`;
+            } else {
+                // 畢業後：幾個人陪我們過了畢業
+                const totalStudents = Object.keys(studentList).length;
+                userDisplay.innerText = `${totalStudents} ${i18n[currentLang].afterUser}`;
+            }
+        }
+
+        // 計算並更新倒數計時
+        function updateTimer() {
+            const now = new Date().getTime();
+            let diff = targetDate - now;
+            const isPast = diff < 0;
+
+            if (isPast) {
+                diff = Math.abs(diff); // 超過時間取絕對值
+            }
+
+            // 精確時間換算
+            const msInSec = 1000;
+            const msInMin = msInSec * 60;
+            const msInHr = msInMin * 60;
+            const msInDay = msInHr * 24;
+            const msInYear = msInDay * 365.25; 
+            const msInMonth = msInYear / 12;
+
+            const years = Math.floor(diff / msInYear);
+            diff %= msInYear;
+
+            const months = Math.floor(diff / msInMonth);
+            diff %= msInMonth;
+
+            const days = Math.floor(diff / msInDay);
+            diff %= msInDay;
+
+            const hours = Math.floor(diff / msInHr);
+            diff %= msInHr;
+
+            const minutes = Math.floor(diff / msInMin);
+            diff %= msInMin;
+
+            const seconds = Math.floor(diff / msInSec);
+
+            // 更新標題與時間文字
+            const titleText = document.getElementById("title-text");
+            const t = i18n[currentLang];
+            
+            if (!isPast) {
+                titleText.innerText = `${t.beforeTitle}`;
+            } else {
+                titleText.innerText = `${t.afterTitle}`;
+            }
+
+            document.getElementById("countdown").innerText = 
+                `${years}${t.year} ${months}${t.month} ${days}${t.day} ${hours}${t.hr} ${minutes}${t.min} ${seconds}${t.sec}`;
+
+            if (currentUser) {
+                updateUserDisplay();
+            }
+        }
+
+        // 網頁開啟時立即執行強制登入流程
+        forceLogin();
+
+        // 啟動定時器
+        setInterval(updateTimer, 1000);
+        updateTimer();
+    </script>
+</body>
+</html>
