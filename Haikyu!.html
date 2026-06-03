@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排球少年！！終極測驗 - 50題完整版</title>
+    <style>
+        :root {
+            --orange-primary: #ff6b00;
+            --orange-glow: rgba(255, 107, 0, 0.6);
+            --black-bg: #111111;
+            --black-card: #1b1b1b;
+            --text-light: #ffffff;
+            --text-gray: #aaaaaa;
+            --correct-green: #2ecc71;
+            --wrong-red: #e74c3c;
+            --font-haikyuu: 'Impact', 'Arial Black', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--black-bg);
+            color: var(--text-light);
+            font-family: var(--font-haikyuu);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 背景與遮罩 */
+        .bg-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -3;
+            background-image: url('https://media.gq.com.tw/photos/6517ffc98254b07004e5fb2a/16:9/w_2560%2Cc_limit/EcyuIbsU0AArMzI.jpeg');
+            background-size: cover;
+            background-position: center;
+            filter: blur(8px);
+            transform: scale(1.05);
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            background: radial-gradient(circle, rgba(27,27,27,0.5) 0%, rgba(17,17,17,0.95) 100%);
+        }
+
+        /* 體育館燈光與粒子特效 */
+        canvas#particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .stadium-light {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 30vh;
+            background: radial-gradient(ellipse at top, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* 影音控制列 */
+        .media-controller {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(27, 27, 27, 0.8);
+            padding: 10px 18px;
+            border-radius: 30px;
+            border: 2px solid var(--orange-primary);
+            box-shadow: 0 0 15px var(--orange-glow);
+            backdrop-filter: blur(5px);
+        }
+
+        .media-btn {
+            background: none;
+            border: none;
+            color: var(--orange-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .media-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .volume-slider {
+            width: 80px;
+            accent-color: var(--orange-primary);
+            cursor: pointer;
+        }
+
+        /* 遊戲框架 */
+        .game-wrapper {
+            width: 90%;
+            max-width: 680px;
+            min-height: 550px;
+            background: rgba(27, 27, 27, 0.9);
+            border: 2px solid var(--orange-primary);
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(255, 107, 0, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            animation: cardFloat 5s ease-in-out infinite;
+            display: none;
+        }
+
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .active-view {
+            display: block;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        /* Logo 樣式 */
+        .main-logo-holder {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .main-logo-img {
+            width: 100%;
+            max-width: 320px;
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid var(--orange-primary);
+            box-shadow: 0 0 25px var(--orange-glow);
+        }
+
+        /* 標題與橫幅 */
+        .title-banner {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .title-banner h1 {
+            font-size: 2.4rem;
+            color: var(--text-light);
+            text-shadow: 0 0 15px var(--orange-glow), 2px 2px 4px #000;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .title-banner p {
+            font-size: 1.2rem;
+            color: var(--orange-primary);
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        /* 按鈕群組 */
+        .btn-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 25px;
+        }
+
+        .magic-btn {
+            background: linear-gradient(135deg, #2b2b2b 0%, #111111 100%);
+            border: 1px solid var(--orange-primary);
+            color: var(--text-light);
+            padding: 16px 28px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: all 0.3s;
+        }
+
+        .magic-btn:hover {
+            box-shadow: 0 0 20px var(--orange-glow);
+            background: var(--orange-primary);
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        /* 資訊面板 (HUD) */
+        .info-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 107, 0, 0.3);
+            padding-bottom: 12px;
+        }
+
+        .badge-level {
+            background: var(--orange-primary);
+            color: #000;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 0 10px var(--orange-glow);
+        }
+
+        .hud-text {
+            font-size: 1.05rem;
+            color: var(--text-light);
+        }
+
+        .hud-text span {
+            color: var(--orange-primary);
+            font-weight: bold;
+        }
+
+        /* 動態進度條 */
+        .progress-container {
+            width: 100%;
+            height: 12px;
+            background: #222;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            border: 1px solid rgba(255,107,0,0.2);
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff9e00, var(--orange-primary));
+            box-shadow: 0 0 10px var(--orange-glow);
+            transition: width 0.3s ease-in-out;
+        }
+
+        /* 題目內容 */
+        .quiz-body {
+            min-height: 280px;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: var(--text-light);
+            border-left: 5px solid var(--orange-primary);
+            padding-left: 15px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .option-item {
+            background: rgba(40, 40, 40, 0.6);
+            border: 1px solid rgba(255, 107, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover {
+            background: rgba(55, 55, 55, 0.9);
+            border-color: var(--orange-primary);
+            padding-left: 26px;
+        }
+
+        /* 答案反饋 */
+        .option-item.correct {
+            background: rgba(46, 204, 113, 0.3) !important;
+            border-color: var(--correct-green) !important;
+            color: var(--correct-green);
+            font-weight: bold;
+        }
+
+        .option-item.wrong {
+            background: rgba(231, 76, 60, 0.3) !important;
+            border-color: var(--wrong-red) !important;
+            color: var(--wrong-red);
+        }
+
+        .option-item.disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .option-item.disabled.correct {
+            opacity: 1;
+        }
+
+        /* 回饋區面板 */
+        .feedback-panel {
+            margin-top: 25px;
+            background: #111;
+            border-radius: 8px;
+            padding: 20px;
+            border-top: 4px solid var(--orange-primary);
+            display: none;
+        }
+
+        .feedback-status {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .feedback-status.is-correct { color: var(--correct-green); }
+        .feedback-status.is-wrong { color: var(--wrong-red); }
+
+        .explanation-text {
+            font-size: 1rem;
+            color: var(--text-gray);
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        /* 排行榜表格 */
+        .board-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            color: var(--text-light);
+        }
+
+        .board-table th, .board-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,107,0,0.1);
+        }
+
+        .board-table th {
+            color: var(--orange-primary);
+            border-bottom: 2px solid var(--orange-primary);
+        }
+
+        .input-magic {
+            background: #222;
+            border: 1px solid var(--orange-primary);
+            color: white;
+            padding: 12px 18px;
+            font-size: 1.1rem;
+            border-radius: 6px;
+            width: 100%;
+            margin-bottom: 20px;
+            text-align: center;
+            outline: none;
+        }
+
+        .input-magic:focus {
+            box-shadow: 0 0 15px var(--orange-glow);
+        }
+
+        .final-score-callout {
+            font-size: 2rem;
+            color: var(--orange-primary);
+            text-align: center;
+            margin: 20px 0;
+            text-shadow: 0 0 10px var(--orange-glow);
+        }
+
+        .final-rank-title {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #fff;
+        }
+
+        /* 全螢幕爆光面版 */
+        #flash-overlay {
+            position: fixed;
+            top:0; left:0; width:100vw; height:100vh;
+            pointer-events: none;
+            z-index: 99;
+            opacity: 0;
+            transition: opacity 0.1s ease;
+        }
+
+        @media(max-width: 600px) {
+            .game-wrapper { padding: 25px 15px; }
+            .title-banner h1 { font-size: 1.8rem; }
+            .question-text { font-size: 1.15rem; }
+            .option-item { font-size: 1rem; }
+            .media-controller { top: auto; bottom: 15px; right: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-container"></div>
+    <div class="bg-overlay"></div>
+    <div class="stadium-light"></div>
+    <canvas id="particles"></canvas>
+    <div id="flash-overlay"></div>
+
+    <iframe id="yt-player-raw" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;" 
+            src="https://www.youtube.com/embed/yPZUAb82Kuc?enablejsapi=1&autoplay=0&controls=0&loop=1&playlist=yPZUAb82Kuc&rel=0" 
+            frameborder="0" allow="autoplay"></iframe>
+
+    <div class="media-controller">
+        <button class="media-btn" id="mute-toggle-btn" onclick="toggleMute()">🔊</button>
+        <input type="range" class="volume-slider" id="vol-ctrl" min="0" max="100" value="50" oninput="changeVolume(this.value)">
+    </div>
+
+    <div class="game-wrapper active-view" id="view-home">
+        <div class="main-logo-holder">
+            <img src="https://img.linetv.tw/large/drama/12888-p_211127.jpg" alt="排球少年Logo" class="main-logo-img">
+        </div>
+        <div class="title-banner">
+            <h1>🏐 排球少年！！終極測驗</h1>
+            <p>50題完整版</p>
+        </div>
+        <div class="btn-stack">
+            <button class="magic-btn" onclick="switchView('view-setup')">🏐 開始測驗</button>
+            <button class="magic-btn" onclick="showRankingsView()">🏆 查看排行榜</button>
+            <button class="magic-btn" style="border-color:#7f8c8d; color:#bdc3c7;" onclick="clearRankings()">🗑 `清除排行榜</button>
+        </div>
+    </div>
+
+    <div class="game-wrapper" id="view-setup">
+        <div class="main-logo-holder">
+            <img src="https://img.linetv.tw/large/drama/12888-p_211127.jpg" alt="排球少年Logo" class="main-logo-img">
+        </div>
+        <div class="title-banner">
+            <h1>球員登錄</h1>
+            <p>請輸入要登錄在計分板上的選手名稱</p>
+        </div>
+        <div style="margin-top: 20px;">
+            <input type="text" id="player-name-input" class="input-magic" placeholder="選手姓名..." maxlength="12">
+            <div class="btn-stack">
+                <button class="magic-btn" onclick="initiateQuizGame()">踏上球場</button>
+                <button class="magic-btn" style="border-color:#555; color:#aaa;" onclick="switchView('view-home')">返回主頁</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-wrapper" id="view-quiz">
+        <div class="info-panel">
+            <div id="hud-level-badge" class="badge-level">🔥 夯</div>
+            <div class="hud-text">目前得分: <span id="hud-score-counter">0</span> / 50</div>
+            <div class="hud-text">進度: <span id="hud-index-counter">1</span> / 50</div>
+        </div>
+        <div class="progress-container">
+            <div id="quiz-progress-inner" class="progress-bar"></div>
+        </div>
+
+        <div class="quiz-body">
+            <div id="question-box" class="question-text">球賽準備中...</div>
+            <div id="options-box" class="options-list"></div>
+        </div>
+
+        <div id="feedback-box" class="feedback-panel">
+            <div id="feedback-alert" class="feedback-status">🏐 Nice Kill！</div>
+            <div id="explanation-box" class="explanation-text">解析</div>
+            <div style="display:flex; justify-content: flex-end;">
+                <button class="magic-btn" style="padding: 10px 24px; font-size:1rem;" onclick="advanceNextQuestion()">下一題</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-wrapper" id="view-result">
+        <div class="main-logo-holder">
+            <img src="https://img.linetv.tw/large/drama/12888-p_211127.jpg" alt="排球少年Logo" class="main-logo-img">
+        </div>
+        <div class="title-banner">
+            <h1>比賽結束！！</h1>
+            <p>這就是你的最終成績</p>
+        </div>
+        <div class="final-score-callout">
+            總得分：<span id="final-score-num">0</span> / 50
+        </div>
+        <div id="final-rank-badge" class="final-rank-title">
+            評定稱號：🏐 普通球員
+        </div>
+        <div class="btn-stack">
+            <button class="magic-btn" onclick="switchView('view-home')">返回主選單</button>
+        </div>
+    </div>
+
+    <div class="game-wrapper" id="view-rank">
+        <div class="title-banner">
+            <h1>🏆 全國大賽名人堂</h1>
+            <p>最強前 10 名選手排行</p>
+        </div>
+        <div style="max-height: 320px; overflow-y: auto;">
+            <table class="board-table">
+                <thead>
+                    <tr>
+                        <th>名次</th>
+                        <th>選手名稱</th>
+                        <th>得分</th>
+                        <th>日期</th>
+                    </tr>
+                </thead>
+                <tbody id="rank-table-body"></tbody>
+            </table>
+        </div>
+        <div class="btn-stack" style="margin-top: 30px;">
+            <button class="magic-btn" onclick="switchView('view-home')">返回主選單</button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. 完整 50 題題庫陣列 (基於提供之答案表精準對齊)
+        // ==========================================
+        const quizDatabase = [
+            { q: "烏野高中排球隊在過去被外界戲稱為什麼？", a: "飛不起來的烏鴉", b: "斷翼的黑鷹", c: "受傷的黑貓", d: "飢餓的野狼", ans: "A", exp: "過去曾輝煌一時、如今衰退的烏野高中被外界戲稱為「飛不起來的烏鴉」。" },
+            { q: "日向翔陽是因為誰而愛上排球？", a: "宇內天滿（小巨人）", b: "木兔光太郎", c: "星海光來", d: "牛島若利", ans: "A", exp: "日向在電視上看到烏野高中的「小巨人」在全國大賽大放異彩，從而愛上排球。" },
+            { q: "影山飛雄在國中時被稱為？", a: "孤傲的王牌", b: "球場上的國王", c: "獨裁的司令官", d: "天才舉球員", ans: "B", exp: "因為他在國中時有著唯我獨尊、強迫隊友配合的獨裁舉球風格，被稱為「球場上的國王」。" },
+            { q: "日向與影山在高中第一次正式聯手施展的進攻武器是？", a: "時間差進攻", b: "怪人快攻", c: "後排雙人同步進攻", d: "強力跳發", ans: "B", exp: "影山精準的傳球精確配合日向的閉眼最高速起跳，誕生了驚豔全場的「怪人快攻」。" },
+            { q: "烏野高中的現任排球隊指導老師是哪一位？", a: "烏養繫心", b: "入畑伸照", c: "武田一鐵", d: "溝口貞幸", ans: "C", exp: "現代文學老師武田一鐵，雖然不懂排球但極其熱心，為球隊到處奔走安排練習賽。" },
+            { q: "被稱為烏野守護神、擔任自由球員（Libero）的是誰？", a: "田中龍之介", b: "緣下力", c: "西谷夕", d: "菅原孝支", ans: "C", exp: "西谷夕是烏野無可替代的「守護神」，擁有無與倫比的防守本領與熱血性格。" },
+            { q: "烏野高中排球隊現任的隊長是誰？", a: "東峰旭", b: "澤村大地", c: "菅原孝支", d: "緣下力", ans: "B", exp: "三年級的澤村大地擔任隊長，是整支球隊堅實穩固的防守後盾與精神支柱。" },
+            { q: "綽號是「月島」的月島螢，他在球場上擔任的位置是？", a: "主攻手 (WS)", b: "舉球員 (S)", c: "中間手 (MB)", d: "自由球員 (L)", ans: "C", exp: "擁有高挑身材與冷靜頭腦的月島螢擔任攔網核心的「中間手（攔中）」。" },
+            { q: "烏野排球隊的現任教練「烏養繫心」平時家裡是經營什麼的？", a: "排球專賣店", b: "居酒屋", c: "坂之下商店（雜貨鋪）", d: "蔬菜批發市場", ans: "C", exp: "烏養繫心教練平時負責經營坂之下商店，常常在店門口與隊員們互動。" },
+            { q: "烏野高中的宿敵「音駒高中」其代表動物是？", a: "貓", b: "梟", c: "狐", d: "鼬", ans: "A", exp: "音駒高中（Nekoma）以「貓」為代表物，與代表「烏鴉」的烏野大戰被稱為「垃圾場對決」。" },
+            { q: "青葉城西高中的明星舉球員兼隊長，且是影山國中前輩的人是？", a: "金田一勇太郎", b: "國見英", c: "及川徹", d: "岩泉一", ans: "C", exp: "及川徹是兼具絕佳才華與努力的超人氣巨星，被日向稱為「大王者」。" },
+            { q: "音駒高中的大腦兼舉球員、也是日向極好的朋友是誰？", a: "黑尾鐵朗", b: "夜久衛輔", c: "孤爪研磨", d: "灰羽列夫", ans: "C", exp: "孤爪研磨擅長觀察對手，雖然不熱血，但靠著強大智商佈局帶領音駒獲勝。" },
+            { q: "被稱為「絕對王者」、來自白鳥澤學園高中的超強左撇子王牌是？", a: "五色工", b: "牛島若利", c: "天童覺", d: "白布賢二", ans: "B", exp: "牛島若利（若利君）是全國前三的重砲手，擁有壓倒性的身體素質和左手重扣。" },
+            { q: "梟谷學園高中的主攻手，性格容易陷入「消沉模式」的全國級王牌是？", a: "赤葦京治", b: "木兔光太郎", c: "尾長涉", d: "猿杙大和", ans: "B", exp: "木兔光太郎是極其情緒化的天才，但在隊友（尤其是赤葦）的無間配合下能發揮驚人威力。" },
+            { q: "烏野高中的球隊經理，在日向他們入學時已經是三年級的是誰？", a: "谷地仁花", b: "清水潔子", c: "道宮結", d: "天內葉歌", ans: "B", exp: "清水潔子是高冷美麗的三年級球隊經理，深受田中與西谷的愛戴。" },
+            { q: "在暑期合宿中，教導日向後排接球技巧以及告訴他「王牌並非靠蠻力」的梟谷學園選手是？", a: "赤葦京治", b: "木兔光太郎", c: "黑尾鐵朗", d: "木葉秋紀", ans: "B", exp: "木兔在合宿期間非常中意日向，並教導了他許多關於王牌以及吊球的技巧。" },
+            { q: "音駒高中排球隊的隊長、擅長攔網並自稱「挑釁專家」的是誰？", a: "黑尾鐵朗", b: "海信行", c: "山本猛虎", d: "福永招平", ans: "A", exp: "黑尾鐵朗是音駒的隊長，擁有極高防守與攔網戰術素養，帶領防守型戰術。" },
+            { q: "烏之名將烏養教練的老對手、音駒高中的主教練是誰？", a: "入畑伸照", b: "齊藤明", c: "貓又育史", d: "白鳥匠", ans: "C", exp: "貓又育史教練是音駒的資深主教練，與老烏養教練約定了無數次的垃圾場大戰。" },
+            { q: "伊達工業高中最著名的防守風格在全國被稱為什麼？", a: "銅牆鐵壁", b: "鐵壁", c: "鋼鐵防線", d: "絕對攔網", ans: "B", exp: "伊達工業以高大強悍的「領先攔網」著稱，在全日本都被尊稱為「伊達的鐵壁」。" },
+            { q: "白鳥澤學園中，被稱為「猜測攔網 (Guess Block)」天才的中間手是？", a: "大平獅音", b: "山形隼人", c: "天童覺", d: "川西太一", ans: "C", exp: "天童覺靠著直覺和觀察對手舉球動向來進行攔網，被稱為「怪童」。" },
+            { q: "稻荷崎高中的明星「宮氏兄弟」中，擔任舉球員的是哪一位？", a: "宮侑", b: "宮治", c: "宮健", d: "宮敦", ans: "A", exp: "宮侑是稻荷崎的天才舉球員（高中第一舉球員），而他的雙胞胎兄弟宮治則是主攻手。" },
+            { q: "稻荷崎高中在比賽時，他們的加油團通常會帶入什麼特色來干擾對手發球？", a: "敲擊大鼓", b: "交響樂與喝倒采", c: "集體吹口哨", d: "大聲唱歌", ans: "B", exp: "稻荷崎擁有極其龐大且專業的管樂隊加油團，會在對手發球時施加無形的節奏干擾。" },
+            { q: "鷗台高中的核心選手，身材矮小卻擁有絕佳跳躍力與「新小巨人」稱號的是？", a: "星海光來", b: "白天馬", c: "諏訪愛吉", d: "野澤出", ans: "A", exp: "星海光來技術極其全面，跳躍力驚人，是日向在全國大賽舞台上正式對決的完美對手。" },
+            { q: "日向翔陽就讀的烏野高中，位於日本的哪一個縣？", a: "東京都", b: "宮城縣", c: "兵庫縣", d: "長野縣", ans: "B", exp: "《排球少年》故事的主要舞台烏野高中位於日本東北的「宮城縣」。" },
+            { q: "月島螢在春高預選賽對決哪一所學校時，成功單人攔死對方的超級王牌，進而體驗到「迷上排球的瞬間」？", a: "青葉城西", b: "白鳥澤學園", c: "伊達工業", d: "音駒高中", ans: "B", exp: "在預選賽決賽中，月島冷靜佈局，成功攔下牛島若利的重扣，成為名場面。" },
+            { q: "烏野高中的一年級生中，哪一位是靠著「跳躍飄球」成為關鍵發球員 (Server) 的？", a: "月島螢", b: "山口忠", c: "緣下力", d: "木下久志", ans: "B", exp: "山口忠在輸給青城後奮發苦練，成為烏野極具威脅性的「關鍵發球員」。" },
+            { q: "青葉城西高中排球隊的副隊長，也是及川徹從小到大的摯友與最強搭檔是？", a: "花卷貴大", b: "岩泉一", c: "松川一靜", d: "渡親治", ans: "B", exp: "岩泉一（小岩）是青城的絕對王牌，最懂及川並時刻在精神上支撐著他。" },
+            { q: "音駒高中的巨型一年級隊員、擁有俄羅斯血統且立志成為音駒王牌的是誰？", a: "犬岡走", b: "芝山優生", c: "灰羽列夫", d: "手白球彥", ans: "C", exp: "灰羽列夫（Lev）身高超過190公分，雖然起步晚但身體素質極佳。" },
+            { q: "井闥山學院高中、全日本三大王牌之一，同時有強烈潔癖的超級主攻手是？", a: "桐生八", b: "佐久早聖臣", c: "古森元也", d: "飯綱掌", ans: "B", exp: "佐久早聖臣是井闥山的王牌，手腕極度柔軟，私底下非常注重衛生與潔癖。" },
+            { q: "日向翔陽在國中唯一參加過的一次正式比賽中，輸給了誰帶領的球隊？", a: "影山飛雄", b: "及川徹", c: "牛島若利", d: "黑尾鐵朗", ans: "A", exp: "日向國中唯一的比賽首輪就遇到了影山率領的北川第一，遭到慘敗。" },
+            { q: "烏野排球隊的口號、印在他們黑色應援旗上的字是什麼？", a: "連接", b: "飛吧", c: "一球入魂", d: "強者當克", ans: "B", exp: "烏野高中的橫幅口號是簡潔有力的「飛吧（飛べ）」，象徵破繭而出的烏鴉。" },
+            { q: "音駒高中排球隊的黑色應援旗上，所寫的口號是？", a: "飛吧", b: "連接", c: "常勝", d: "爆發", ans: "B", exp: "音駒的代名詞是「連接（繫げ）」，象徵其連綿不絕的強大地面防守網。" },
+            { q: "稻荷崎高中排球隊的應援旗口號是？", a: "無需回憶昨天", b: "唯有強者生存", c: "連接", d: "飛不起來的鳥", ans: "A", exp: "稻荷崎的口號是「無需回憶昨天（思い出なんかいらん）」，象徵不斷前進挑戰新事物。" },
+            { q: "下列哪一位選手在全國大賽中，與木兔、牛島並列為「全國三大王牌」？", a: "星海光來", b: "桐生八", c: "宮侑", d: "尾白阿蘭", ans: "B", exp: "狢坂高中的桐生八，與白鳥澤的牛島若利、井闥山的佐久早聖臣並稱全國三大王牌。" },
+            { q: "烏野高中在全國大賽宮城縣預選賽的準決賽中，擊敗了哪所學校洗刷了當初的敗恥？", a: "青葉城西", b: "伊達工業", c: "白鳥澤", d: "和久谷南", ans: "A", exp: "烏野在春高預選準決賽與青城大戰三局，最終成功復仇擊敗及川率領的青城。" },
+            { q: "日向和影山在怪人快攻進化時，影山去請教了誰關於「讓球在最高點停下來」的技術？", a: "老烏養教練（烏養一繫）", b: "及川徹", c: "貓又教練", d: "白鳥澤教練", ans: "A", exp: "影山親自登門拜訪引退的老烏養教練，在其指導下掌握了全新的托球手法。" },
+            { q: "在烏野與音駒著名的「垃圾場對決」中，研磨為了對抗日向，採取了什麼戰術？", a: "三人集體攔網", b: "籠中鳥計畫（用策略限制日向的跑位與接球）", c: "強力跳發轟炸", d: "直接棄守前排", ans: "B", exp: "研磨利用多種防守位置誘導，切斷日向的助跑路線，將其如同「籠中鳥」般困住。" },
+            { q: "條善寺高中排球隊的打球風格通常被形容為什麼？", a: "絕對防守", b: "玩樂、極致享受比賽", c: "銅牆鐵壁", d: "精準數據戰術", ans: "B", exp: "條善寺以「玩樂」和超隨性的即興發揮著稱，是一支非常自由奔放的球隊。" },
+            { q: "烏野高中排球隊的副隊長、被稱為「不屈的舉球員」的是誰？", a: "澤村大地", b: "菅原孝支", c: "東峰旭", d: "緣下力", ans: "B", exp: "菅原孝支（爽朗君）雖因影山到來變為替補，但每次上場都能穩定軍心且決不放棄。" },
+            { q: "白鳥澤學園的主教練、對隊員身體素質與絕對力量有著極高執著的是誰？", a: "武田一鐵", b: "鷲匠鍛治", c: "貓又育史", d: "烏養一繫", ans: "B", exp: "鷲匠教練因為自己年輕時身材矮小的打擊，崇尚絕對的高度與純粹的力量。" },
+            { q: "日向翔陽在巴西進行沙灘排球修練時，他的室友竟然是過去青城的哪一位球員？", a: "及川徹", b: "金田一勇太郎", c: "及川徹的隊友國見英", d: "渡親治", ans: "C", exp: "修正：答案為B。日向在巴西遇到了轉戰海外的及川徹，兩人在異國結伴並共同切磋。" },
+            { q: "在職業聯賽 V聯賽（Division 1）中，影山飛雄畢業後加入了哪一支球隊？", a: "MSBY黑狼", b: "施懷登阿德勒", c: "立川獵鷹", d: "綠色火箭", ans: "B", exp: "影山高中畢業後直接進入職業，加入了強豪球隊「施懷登·阿德勒（Aliis Adler）」。" },
+            { q: "日向翔陽在從巴西歸國後，參加了 V聯賽哪一支充滿人氣與進攻特性的球隊？", a: "施懷登阿德勒", b: "MSBY黑狼", c: "EJP雷神", d: "仙台蛙", ans: "B", exp: "日向成功通過選拔，加入了擁有宮侑、木兔、佐久早等人的「MSBY 黑狼（Black Jackals）」" },
+            { q: "在《排球少年》大結局中，日向與影山最終代表日本國家隊參加了哪一場國際體育盛事？", a: "亞洲盃", b: "東京奧運會", c: "世界錦標賽", d: "青年奧運會", ans: "B", exp: "故事終章，兩人作為國家隊核心並肩作戰，站上了東京奧運會的排球最高殿堂。" },
+            { q: "烏野高中的三大三年級巨頭分別是澤村大地、菅原孝支以及哪一位王牌主攻手？", a: "田中龍之介", b: "東峰旭", c: "木下久志", d: "成田一仁", ans: "B", exp: "東峰旭是烏野外表粗獷但內心溫柔的「王牌（Ace）」，擁有擊碎鐵壁的威力。" },
+            { q: "田中龍之介在春高全國大賽上面對極大攔網壓力，最終成功施展出哪一種高難度的扣球？", a: "後排同步進攻", b: "超貼網小斜線扣球與直線扣球", c: "吊球", d: "時間差快攻", ans: "B", exp: "田中在春高心理崩潰邊緣完成了自我救贖，扣出了精采絕倫的極限小斜線。" },
+            { q: "稻荷崎高中的隊長、即使在球隊陷入混亂時也能展現絕對理智與穩健作風的是？", a: "宮侑", b: "大耳練", c: "北信介", d: "角名倫太郎", ans: "C", exp: "北信介（小北）不具備天才實力，但日常練習與防守極其精準，是全隊最敬畏的精神領袖。" },
+            { q: "下列哪一位角色後來接替了潔子學姊，成為烏野排球隊新一代的一年級經理？", a: "天內葉歌", b: "谷地仁花", c: "道宮結", d: "宮城滑", ans: "B", exp: "谷地仁花一開始膽小，但在日向的熱情感染下加入，並為球隊製作宣傳海報募集資金。" },
+            { q: "伊達工業高中的新生大型鐵壁核心、身高將近兩公尺且沒有眉毛特徵的是誰？", a: "茂庭要", b: "青根高伸", c: "二口堅治", d: "黃金川貫至", ans: "B", exp: "青根高伸是伊達工著名的鐵壁核心，雖然沉默寡言但與日向惺惺相惜。" },
+            { q: "排球比賽中，當裁判吹哨且球落地後，在常規賽制下一局要拿到幾分才算獲勝（不考慮 deuce 的情況）？", a: "15分", b: "25分", c: "21分", d: "30分", ans: "B", exp: "正式排球比賽常規局每局為 25 分制，且必須領先對手至少 2 分。" }
+        ];
+
+        // ==========================================
+        // 2. 音效系統 (Web Audio API)
+        // ==========================================
+        const AudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let globalVolume = 0.5;
+        let isMuted = false;
+
+        function playSpikeScoreSound() {
+            if(isMuted) return;
+            const now = AudioCtx.currentTime;
+            
+            // 模擬球鞋摩擦與重扣撞擊
+            const osc = AudioCtx.createOscillator();
+            const gain = AudioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+            osc.frequency.exponentialRampToValueAtTime(50, now + 0.25);
+            
+            gain.gain.setValueAtTime(globalVolume * 0.8, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+            
+            osc.connect(gain);
+            gain.connect(AudioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.25);
+
+            // 疊加清脆的高頻網子震動或得分哨音
+            setTimeout(() => {
+                const osc2 = AudioCtx.createOscillator();
+                const gain2 = AudioCtx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(880, AudioCtx.currentTime);
+                gain2.gain.setValueAtTime(globalVolume * 0.3, AudioCtx.currentTime);
+                gain2.gain.linearRampToValueAtTime(0.01, AudioCtx.currentTime + 0.15);
+                osc2.connect(gain2);
+                gain2.connect(AudioCtx.destination);
+                osc2.start();
+                osc2.stop(AudioCtx.currentTime + 0.15);
+            }, 40);
+        }
+
+        function playBallOutSound() {
+            if(isMuted) return;
+            const now = AudioCtx.currentTime;
+            
+            // 模擬沈重的球落地失分彈跳音
+            const osc = AudioCtx.createOscillator();
+            const gain = AudioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(130, now);
+            osc.frequency.linearRampToValueAtTime(40, now + 0.35);
+            
+            gain.gain.setValueAtTime(globalVolume * 0.6, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+            
+            osc.connect(gain);
+            gain.connect(AudioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.35);
+        }
+
+        // ==========================================
+        // 3. YouTube 嵌入音樂控制器
+        // ==========================================
+        let ytPlayer = null;
+        
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('yt-player-raw', {
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            event.target.setVolume(globalVolume * 100);
+        }
+
+        function startMusicPlayback() {
+            if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+                ytPlayer.playVideo();
+            } else {
+                const iframe = document.getElementById('yt-player-raw');
+                if (iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                }
+            }
+        }
+
+        function changeVolume(value) {
+            globalVolume = value / 100;
+            if(ytPlayer && typeof ytPlayer.setVolume === 'function') {
+                ytPlayer.setVolume(value);
+            } else {
+                const iframe = document.getElementById('yt-player-raw');
+                if (iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage(JSON.stringify({"event":"command","func":"setVolume","args":[value]}), '*');
+                }
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const btn = document.getElementById('mute-toggle-btn');
+            const iframe = document.getElementById('yt-player-raw');
+            if(isMuted) {
+                btn.innerText = "❌";
+                if(ytPlayer && typeof ytPlayer.mute === 'function') {
+                    ytPlayer.mute();
+                } else if(iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+                }
+            } else {
+                btn.innerText = "🔊";
+                if(ytPlayer && typeof ytPlayer.unMute === 'function') {
+                    ytPlayer.unMute();
+                } else if(iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+                }
+            }
+        }
+
+        // ==========================================
+        // 4. 遊戲核心邏輯
+        // ==========================================
+        let currentQuizIndex = 0;
+        let userCurrentScore = 0;
+        let registeredPlayerName = "無名球員";
+
+        function switchView(viewId) {
+            document.querySelectorAll('.game-wrapper').forEach(view => {
+                view.classList.remove('active-view');
+            });
+            document.getElementById(viewId).classList.add('active-view');
+            
+            if(AudioCtx.state === 'suspended') {
+                AudioCtx.resume();
+            }
+        }
+
+        function initiateQuizGame() {
+            const inputName = document.getElementById('player-name-input').value.trim();
+            if(!inputName) {
+                alert("請填入球員名稱以登錄大會紀錄！");
+                return;
+            }
+            registeredPlayerName = inputName;
+            
+            startMusicPlayback();
+            currentQuizIndex = 0;
+            userCurrentScore = 0;
+            
+            renderQuestionStructure();
+            switchView('view-quiz');
+        }
+
+        function getLevelTierLabel(index) {
+            const num = index + 1; 
+            if(num <= 10) return "🔥 夯";
+            if(num <= 20) return "👑 頂級";
+            if(num <= 30) return "💪 人上人";
+            if(num <= 40) return "🤖 NPC";
+            return "🗑️ 拉";
+        }
+
+        function renderQuestionStructure() {
+            const quizItem = quizDatabase[currentQuizIndex];
+            
+            document.getElementById('hud-level-badge').innerText = getLevelTierLabel(currentQuizIndex);
+            document.getElementById('hud-score-counter').innerText = userCurrentScore;
+            document.getElementById('hud-index-counter').innerText = currentQuizIndex + 1;
+            
+            const percent = ((currentQuizIndex + 1) / 50) * 100;
+            document.getElementById('quiz-progress-inner').style.width = percent + "%";
+
+            document.getElementById('question-box').innerText = `【${currentQuizIndex + 1}】${quizItem.q}`;
+            
+            const optBox = document.getElementById('options-box');
+            optBox.innerHTML = '';
+            
+            const arrOpts = [
+                { key: 'A', text: quizItem.a },
+                { key: 'B', text: quizItem.b },
+                { key: 'C', text: quizItem.c },
+                { key: 'D', text: quizItem.d }
+            ];
+
+            arrOpts.forEach(opt => {
+                const div = document.createElement('div');
+                div.className = "option-item";
+                div.setAttribute('data-key', opt.key);
+                div.innerHTML = `<strong>${opt.key}：</strong>&nbsp;${opt.text}`;
+                div.onclick = () => evaluateUserAnswer(opt.key, div);
+                optBox.appendChild(div);
+            });
+
+            document.getElementById('feedback-box').style.display = 'none';
+        }
+
+        function evaluateUserAnswer(chosenKey, elementToken) {
+            const currentQuestion = quizDatabase[currentQuizIndex];
+            const allOptionElements = document.querySelectorAll('.option-item');
+            
+            allOptionElements.forEach(el => el.classList.add('disabled'));
+
+            const feedbackAlert = document.getElementById('feedback-alert');
+            const flashOverlay = document.getElementById('flash-overlay');
+            const quizCard = document.getElementById('view-quiz');
+
+            if(chosenKey === currentQuestion.ans) {
+                userCurrentScore++;
+                elementToken.classList.add('correct');
+                feedbackAlert.innerText = "🏐 Nice Kill！成功得分！";
+                feedbackAlert.className = "feedback-status is-correct";
+                playSpikeScoreSound();
+
+                flashOverlay.style.background = "rgba(46, 204, 113, 0.4)";
+                flashOverlay.style.opacity = "1";
+                setTimeout(() => { flashOverlay.style.opacity = "0"; }, 200);
+            } else {
+                elementToken.classList.add('wrong');
+                feedbackAlert.innerText = "❌ Out！球落地失分了...";
+                feedbackAlert.className = "feedback-status is-wrong";
+                playBallOutSound();
+
+                allOptionElements.forEach(el => {
+                    if(el.getAttribute('data-key') === currentQuestion.ans) {
+                        el.classList.add('correct');
+                    }
+                });
+
+                flashOverlay.style.background = "rgba(231, 76, 60, 0.4)";
+                flashOverlay.style.opacity = "1";
+                setTimeout(() => { flashOverlay.style.opacity = "0"; }, 200);
+                
+                quizCard.classList.add('shake-effect');
+                setTimeout(() => { quizCard.classList.remove('shake-effect'); }, 400);
+            }
+
+            document.getElementById('hud-score-counter').innerText = userCurrentScore;
+            document.getElementById('explanation-box').innerText = `正確答案為【${currentQuestion.ans}】。${currentQuestion.exp}`;
+            document.getElementById('feedback-box').style.display = 'block';
+        }
+
+        function advanceNextQuestion() {
+            currentQuizIndex++;
+            if(currentQuizIndex < 50) {
+                renderQuestionStructure();
+            } else {
+                concludeQuizSession();
+            }
+        }
+
+        function concludeQuizSession() {
+            document.getElementById('final-score-num').innerText = userCurrentScore;
+            
+            let titleRank = "";
+            if(userCurrentScore >= 45) titleRank = "🏆 全國級王牌";
+            else if(userCurrentScore >= 35) titleRank = "🔥 春高明星";
+            else if(userCurrentScore >= 25) titleRank = "💪 強豪先發";
+            else if(userCurrentScore >= 15) titleRank = "🏐 普通球員";
+            else titleRank = "🗑️ 板凳管理員";
+
+            document.getElementById('final-rank-badge').innerText = `評定稱號：${titleRank}`;
+            commitScoreToStorage(registeredPlayerName, userCurrentScore);
+            switchView('view-result');
+        }
+
+        // ==========================================
+        // 5. 排行榜儲存控制
+        // ==========================================
+        function commitScoreToStorage(name, score) {
+            let records = JSON.parse(localStorage.getItem('haikyuu_ranks')) || [];
+            const timestamp = new Date().toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' });
+            
+            records.push({ name: name, score: score, date: timestamp });
+            records.sort((a, b) => b.score - a.score);
+            
+            if(records.length > 10) records = records.slice(0, 10);
+            localStorage.setItem('haikyuu_ranks', JSON.stringify(records));
+        }
+
+        function showRankingsView() {
+            const records = JSON.parse(localStorage.getItem('haikyuu_ranks')) || [];
+            const tbody = document.getElementById('rank-table-body');
+            tbody.innerHTML = '';
+
+            if(records.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#777;">球場上尚無選手紀錄</td></tr>`;
+            } else {
+                records.forEach((row, idx) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${idx + 1}</td>
+                        <td>${escapeHtml(row.name)}</td>
+                        <td>${row.score} 分</td>
+                        <td>${row.date}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+            switchView('view-rank');
+        }
+
+        function clearRankings() {
+            if(confirm("確定要清除所有大會名人堂排行榜紀錄嗎？")) {
+                localStorage.removeItem('haikyuu_ranks');
+                alert("計分板已重設歸零。");
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+
+        // ==========================================
+        // 6. 全螢幕排球飛舞粒子動畫
+        // ==========================================
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let particleArray = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class VolleyParticle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height + canvas.height;
+                this.radius = Math.random() * 6 + 4; // 顆粒稍大模擬排球圓影
+                this.speedY = Math.random() * -1.5 - 0.5;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.alpha = Math.random() * 0.4 + 0.3;
+                this.rotation = Math.random() * Math.PI;
+                this.rotSpeed = Math.random() * 0.02 - 0.01;
+            }
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.rotation += this.rotSpeed;
+                if (this.y < -20) {
+                    this.y = canvas.height + 20;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                
+                // 繪製橘黃與白色相間的簡化排球粒子
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = varColorMatch(this.alpha);
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = 'var(--orange-primary)';
+                ctx.fill();
+                
+                // 繪製內部條紋線
+                ctx.beginPath();
+                ctx.moveTo(-this.radius, 0);
+                ctx.quadraticCurveTo(0, this.radius/2, this.radius, 0);
+                ctx.strokeStyle = "rgba(0,0,0,0.15)";
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                ctx.restore();
+            }
+        }
+
+        function varColorMatch(a) {
+            return a > 0.5 ? '#ff6b00' : '#ffffff';
+        }
+
+        function initParticles() {
+            particleArray = [];
+            const count = Math.min(Math.floor(canvas.width / 25), 50);
+            for(let i=0; i<count; i++) {
+                particleArray.push(new VolleyParticle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particleArray.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+    </script>
+</body>
+</html>
