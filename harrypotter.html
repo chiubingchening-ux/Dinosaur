@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>哈利波特知識王 - 終極魔法測驗 Pro Max</title>
+    <title>哈利波特知識王 - 終極魔法測驗 Pro Max 旗艦版</title>
     <style>
         :root {
             --gold-light: #ffd700;
@@ -150,6 +150,37 @@
             40%, 80% { transform: translateX(8px); }
         }
 
+        /* 【新追加】官方主Logo大型排版樣式 */
+        .main-logo-holder {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .main-logo-img {
+            width: 100%;
+            max-width: 320px;
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid var(--gold-dark);
+            box-shadow: 0 0 25px var(--gold-glow);
+            transition: transform 0.3s ease;
+        }
+
+        .main-logo-img:hover {
+            transform: scale(1.03);
+            border-color: var(--gold-light);
+        }
+
+        /* 小微型 Logo (內頁用) */
+        .mini-logo-inline {
+            height: 35px;
+            width: auto;
+            border-radius: 4px;
+            border: 1px solid var(--gold-dark);
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
         /* 首頁與結算排版 */
         .title-banner {
             text-align: center;
@@ -157,7 +188,7 @@
         }
 
         .title-banner h1 {
-            font-size: 2.4rem;
+            font-size: 2.2rem;
             color: var(--gold-light);
             text-shadow: 0 0 15px var(--gold-glow), 2px 2px 4px #000;
             letter-spacing: 2px;
@@ -174,7 +205,7 @@
             display: flex;
             flex-direction: column;
             gap: 18px;
-            margin-top: 40px;
+            margin-top: 30px;
         }
 
         .magic-btn {
@@ -335,7 +366,7 @@
             opacity: 1;
         }
 
-        /* 【新功能】第 5 題限定彩蛋按鈕 */
+        /* 第 5 題限定彩蛋按鈕 */
         .easter-egg-btn {
             position: absolute;
             bottom: -15px;
@@ -471,10 +502,11 @@
 
         @media(max-width: 600px) {
             .game-wrapper { padding: 20px 15px; }
-            .title-banner h1 { font-size: 1.8rem; }
+            .title-banner h1 { font-size: 1.6rem; }
             .question-text { font-size: 1.15rem; }
             .option-item { font-size: 1rem; padding: 12px 15px; }
             .media-controller { top: auto; bottom: 15px; right: 15px; }
+            .main-logo-img { max-width: 240px; }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
@@ -486,19 +518,26 @@
     <canvas id="particles"></canvas>
     <div id="flash-overlay"></div>
 
+    <!-- 背景音樂播放器載體 -->
     <iframe id="yt-player-raw" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;" 
             src="https://www.youtube.com/embed/E2vo0qvKGCM?enablejsapi=1&autoplay=0&controls=0&loop=1&playlist=E2vo0qvKGCM&rel=0" 
             frameborder="0" allow="autoplay"></iframe>
 
+    <!-- 影音控制組 -->
     <div class="media-controller">
         <button class="media-btn" id="mute-toggle-btn" onclick="toggleMute()">🔊</button>
         <input type="range" class="volume-slider" id="vol-ctrl" min="0" max="100" value="50" oninput="changeVolume(this.value)">
     </div>
 
+    <!-- 主選單視圖 -->
     <div class="game-wrapper active-view" id="view-home">
+        <!-- 【新導入】Pro Max 尊爵版金底 Logo 圖片 -->
+        <div class="main-logo-holder">
+            <img src="https://www.nlpi.edu.tw/FileDownLoad/MovieFestival/20191210083945443.JPG" alt="哈利波特Logo" class="main-logo-img">
+        </div>
         <div class="title-banner">
-            <h1>⚡ 哈利波特終極測驗</h1>
-            <p>50題巫師完整 Pro Max 版資料庫</p>
+            <h1>哈利波特終極測驗</h1>
+            <p>50題巫師完整 Pro Max 旗艦資料庫</p>
         </div>
         <div class="btn-stack">
             <button class="magic-btn" onclick="switchView('view-setup')">開始測驗</button>
@@ -507,12 +546,16 @@
         </div>
     </div>
 
+    <!-- 填寫名稱視圖 -->
     <div class="game-wrapper" id="view-setup">
+        <div class="main-logo-holder">
+            <img src="https://www.nlpi.edu.tw/FileDownLoad/MovieFestival/20191210083945443.JPG" alt="哈利波特Logo" class="main-logo-img">
+        </div>
         <div class="title-banner">
             <h1>登錄魔法部</h1>
             <p>請寫下魔杖持有者的真實姓名</p>
         </div>
-        <div style="margin-top: 40px;">
+        <div style="margin-top: 20px;">
             <input type="text" id="player-name-input" class="input-magic" placeholder="輸入您的巫師名稱..." maxlength="12">
             <div class="btn-stack">
                 <button class="magic-btn" onclick="initiateQuizGame()">進入霍格華茲</button>
@@ -521,10 +564,15 @@
         </div>
     </div>
 
+    <!-- 核心問答視圖 -->
     <div class="game-wrapper" id="view-quiz">
         <div class="info-panel">
             <div id="hud-level-badge" class="badge-level">🔥 夯</div>
-            <div class="hud-text">目前分數: <span id="hud-score-counter">0</span> / 50</div>
+            <div class="hud-text">
+                <!-- 【小彩蛋】內頁標籤同步整合微型識別章 -->
+                <img src="https://www.nlpi.edu.tw/FileDownLoad/MovieFestival/20191210083945443.JPG" class="mini-logo-inline" alt="mini-logo">
+                目前分數: <span id="hud-score-counter">0</span> / 50
+            </div>
             <div class="hud-text">進度: <span id="hud-index-counter">1</span> / 50</div>
         </div>
         <div class="progress-container">
@@ -534,7 +582,9 @@
         <div class="quiz-body">
             <div id="question-box" class="question-text">載入題目中...</div>
             <div id="options-box" class="options-list">
-                </div>
+                <!-- 動態注入選項 -->
+            </div>
+            <!-- 第 5 題限定消去法彩蛋按鈕 -->
             <button id="reparo-egg-btn" class="easter-egg-btn" onclick="triggerReparoMagic()">🪄 施展「復復修」消去法</button>
         </div>
 
@@ -547,7 +597,11 @@
         </div>
     </div>
 
+    <!-- 結算總分視圖 -->
     <div class="game-wrapper" id="view-result">
+        <div class="main-logo-holder">
+            <img src="https://www.nlpi.edu.tw/FileDownLoad/MovieFestival/20191210083945443.JPG" alt="哈利波特Logo" class="main-logo-img">
+        </div>
         <div class="title-banner">
             <h1>測驗完成</h1>
             <p>大難不死的男孩見證了你的成績</p>
@@ -563,6 +617,7 @@
         </div>
     </div>
 
+    <!-- 排行榜視圖 -->
     <div class="game-wrapper" id="view-rank">
         <div class="title-banner">
             <h1>🏆 魔法部名人堂</h1>
@@ -579,7 +634,8 @@
                     </tr>
                 </thead>
                 <tbody id="rank-table-body">
-                    </tbody>
+                    <!-- 動態注入排行 -->
+                </tbody>
             </table>
         </div>
         <div class="btn-stack" style="margin-top: 30px;">
@@ -677,7 +733,6 @@
             osc.stop(now + 0.4);
         }
 
-        // 施展彩蛋魔法時的特殊音效
         function playEggMagicSound() {
             if(isMuted) return;
             const now = AudioCtx.currentTime;
@@ -700,7 +755,7 @@
         }
 
         // ==========================================
-        // 3. YouTube 嵌入音樂控制器 (對應指定歌曲)
+        // 3. YouTube 嵌入音樂控制器
         // ==========================================
         let ytPlayer = null;
         
@@ -792,7 +847,6 @@
             }
             registeredPlayerName = inputName;
             
-            // 強制喚醒 Web Audio API 並播放新替換的 YouTube 魔法曲
             if(AudioCtx.state === 'suspended') {
                 AudioCtx.resume();
             }
@@ -826,8 +880,8 @@
 
             document.getElementById('question-box').innerText = `【${currentQuizIndex + 1}】${quizItem.q}`;
             
-            // 【核心彩蛋判斷】如果是第 5 題（索引為 4），顯示消去法按鈕
-            const eggBtn = document.getElementById('repar-egg-btn') || document.getElementById('reparo-egg-btn');
+            // 第 5 題（索引為 4）顯示消去法按鈕
+            const eggBtn = document.getElementById('reparo-egg-btn');
             if (currentQuizIndex === 4) {
                 eggBtn.style.display = 'block';
             } else {
@@ -847,7 +901,6 @@
             arrOpts.forEach(opt => {
                 const div = document.createElement('div');
                 div.className = "option-item";
-                // 給予一個自訂屬性以便彩蛋函數辨識正確/錯誤答案
                 div.setAttribute('data-key', opt.key);
                 div.innerHTML = `<strong>${opt.key}：</strong>&nbsp;${opt.text}`;
                 div.onclick = () => evaluateUserAnswer(opt.key, div);
@@ -857,13 +910,12 @@
             document.getElementById('feedback-box').style.display = 'none';
         }
 
-        // 【新追加】第 5 題限定的「復復修」消去法彩蛋
+        // 第 5 題限定「復復修」消去法
         function triggerReparoMagic() {
             const currentQuestion = quizDatabase[currentQuizIndex];
             const allOptionElements = document.querySelectorAll('.option-item');
             const eggBtn = document.getElementById('reparo-egg-btn');
             
-            // 找出所有錯誤的答案節點
             let wrongElements = [];
             allOptionElements.forEach(el => {
                 const key = el.getAttribute('data-key');
@@ -872,21 +924,17 @@
                 }
             });
 
-            // 隨機打亂錯誤答案排序，並挑選其中兩個進行「擦除」
             wrongElements.sort(() => Math.random() - 0.5);
             
-            // 抹除前兩個錯誤選項
             if (wrongElements[0]) wrongElements[0].classList.add('erased');
             if (wrongElements[1]) wrongElements[1].classList.add('erased');
 
-            // 播放炫麗魔法聲效與閃爍特效
             playEggMagicSound();
             const flashOverlay = document.getElementById('flash-overlay');
             flashOverlay.style.background = "rgba(255, 215, 0, 0.3)";
             flashOverlay.style.opacity = "1";
             setTimeout(() => { flashOverlay.style.opacity = "0"; }, 300);
 
-            // 施展完後隱藏按鈕
             eggBtn.style.display = 'none';
         }
 
@@ -894,9 +942,7 @@
             const currentQuestion = quizDatabase[currentQuizIndex];
             const allOptionElements = document.querySelectorAll('.option-item');
             
-            // 隱藏彩蛋按鈕，防止答完還去點擊
             document.getElementById('reparo-egg-btn').style.display = 'none';
-
             allOptionElements.forEach(el => el.classList.add('disabled'));
 
             const feedbackAlert = document.getElementById('feedback-alert');
