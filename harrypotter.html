@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>哈利波特知識王 - 終極魔法測驗 Pro Max 旗艦版</title>
+    <title>哈利波特：究極終端魔幻測驗</title>
     <style>
         :root {
-            --gold-light: #ffd700;
-            --gold-dark: #b39200;
-            --gold-glow: rgba(255, 215, 0, 0.6);
-            --blue-magic: #0d1b2a;
-            --blue-light: #1b263b;
-            --bg-dark: #0a0e14;
-            --text-light: #f4f5f6;
+            --gold-primary: #d4af37;
+            --gold-glow: rgba(212, 175, 55, 0.6);
+            --magic-navy: #0a0e17;
+            --magic-card: #131924;
+            --text-light: #f3edd7;
+            --text-gray: #9ca3af;
             --correct-green: #2ecc71;
             --wrong-red: #e74c3c;
-            --font-magic: 'Cinzel', 'Times New Roman', serif, 'PingFang TC', 'Microsoft JhengHei';
+            --font-magic: 'Cinzel', 'Georgia', 'PingFang TC', 'Microsoft JhengHei', serif;
         }
 
         * {
@@ -26,7 +25,7 @@
         }
 
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--magic-navy);
             color: var(--text-light);
             font-family: var(--font-magic);
             min-height: 100vh;
@@ -36,543 +35,242 @@
             align-items: center;
         }
 
-        /* 背景與遮罩 */
+        /* 魔法全螢幕背景 */
         .bg-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: -3;
-            background-image: url('https://www.hogwartslegacy.com/images/share.jpg');
+            background-image: url('https://media.gq.com.tw/photos/6517ffc98254b07004e5fb2a/16:9/w_2560%2Cc_limit/EcyuIbsU0AArMzI.jpeg');
             background-size: cover;
             background-position: center;
-            filter: blur(8px);
+            filter: blur(10px);
             transform: scale(1.05);
         }
 
         .bg-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: -2;
-            background: radial-gradient(circle, rgba(13,27,42,0.6) 0%, rgba(10,14,20,0.9) 100%);
+            background: radial-gradient(circle, rgba(19,25,36,0.6) 0%, rgba(10,14,23,0.98) 100%);
         }
 
-        canvas#particles {
+        canvas#magic-particles {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: -1;
             pointer-events: none;
         }
 
-        /* 影音控制列 */
+        /* 音樂控制列 */
         .media-controller {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 20px; right: 20px;
             z-index: 100;
             display: flex;
             align-items: center;
             gap: 12px;
-            background: rgba(13, 27, 42, 0.7);
+            background: rgba(19, 25, 36, 0.9);
             padding: 10px 18px;
             border-radius: 30px;
-            border: 1px solid var(--gold-dark);
+            border: 2px solid var(--gold-primary);
             box-shadow: 0 0 15px var(--gold-glow);
             backdrop-filter: blur(5px);
         }
 
         .media-btn {
-            background: none;
-            border: none;
-            color: var(--gold-light);
-            font-size: 1.2rem;
-            cursor: pointer;
+            background: none; border: none;
+            color: var(--gold-primary);
+            font-size: 1.2rem; cursor: pointer;
             transition: transform 0.2s;
         }
 
-        .media-btn:hover {
-            transform: scale(1.1);
-        }
+        .media-btn:hover { transform: scale(1.1); }
+        .volume-slider { width: 80px; accent-color: var(--gold-primary); cursor: pointer; }
 
-        .volume-slider {
-            width: 80px;
-            accent-color: var(--gold-light);
-            cursor: pointer;
-        }
-
-        /* 遊戲框架外包 */
+        /* 羊皮紙魔法卡片框架 */
         .game-wrapper {
             width: 90%;
             max-width: 680px;
             min-height: 550px;
-            background: rgba(27, 38, 59, 0.85);
-            border: 2px solid var(--gold-dark);
+            background: rgba(19, 25, 36, 0.92);
+            border: 2px solid var(--gold-primary);
             border-radius: 16px;
             padding: 35px;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(212, 175, 55, 0.15);
             backdrop-filter: blur(10px);
             position: relative;
             animation: cardFloat 6s ease-in-out infinite;
             display: none;
-            transform-style: preserve-3d;
         }
 
         @keyframes cardFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(0.5deg); }
         }
 
-        .active-view {
-            display: block;
-            animation: fadeIn 0.6s ease-out forwards;
-        }
+        .active-view { display: block; animation: fadeIn 0.6s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .shake-effect { animation: wandZap 0.4s ease-in-out; }
+        @keyframes wandZap { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-8px) rotate(-1deg); } 40%, 80% { transform: translateX(8px) rotate(1deg); } }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        /* 答錯震動特效 */
-        .shake-effect {
-            animation: shake 0.4s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-8px); }
-            40%, 80% { transform: translateX(8px); }
-        }
-
-        /* 【新追加】官方主Logo大型排版樣式 */
-        .main-logo-holder {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
+        /* Logo 與 Banner */
+        .main-logo-holder { text-align: center; margin-bottom: 20px; }
         .main-logo-img {
-            width: 100%;
-            max-width: 320px;
-            height: auto;
-            border-radius: 10px;
-            border: 2px solid var(--gold-dark);
+            width: 100%; max-width: 220px; height: auto;
+            border-radius: 50%; border: 2px solid var(--gold-primary);
             box-shadow: 0 0 25px var(--gold-glow);
-            transition: transform 0.3s ease;
         }
 
-        .main-logo-img:hover {
-            transform: scale(1.03);
-            border-color: var(--gold-light);
-        }
-
-        /* 小微型 Logo (內頁用) */
-        .mini-logo-inline {
-            height: 35px;
-            width: auto;
-            border-radius: 4px;
-            border: 1px solid var(--gold-dark);
-            vertical-align: middle;
-            margin-right: 10px;
-        }
-
-        /* 首頁與結算排版 */
-        .title-banner {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
+        .title-banner { text-align: center; margin-bottom: 25px; }
         .title-banner h1 {
-            font-size: 2.2rem;
-            color: var(--gold-light);
+            font-size: 2.2rem; color: var(--text-light);
             text-shadow: 0 0 15px var(--gold-glow), 2px 2px 4px #000;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
+            letter-spacing: 2px; margin-bottom: 5px;
         }
+        .title-banner p { font-size: 1.1rem; color: var(--gold-primary); letter-spacing: 3px; font-weight: bold; }
 
-        .title-banner p {
-            font-size: 1.1rem;
-            color: #a4b0be;
-            letter-spacing: 1px;
-        }
-
-        .btn-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-            margin-top: 30px;
-        }
-
+        /* 魔法按鈕 */
+        .btn-stack { display: flex; flex-direction: column; gap: 16px; margin-top: 25px; }
         .magic-btn {
-            background: linear-gradient(135deg, #1b263b 0%, #0d1b2a 100%);
-            border: 1px solid var(--gold-dark);
-            color: var(--gold-light);
-            padding: 16px 28px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            background: linear-gradient(135deg, #1a2333 0%, #0d131f 100%);
+            border: 1px solid var(--gold-primary);
+            color: var(--text-light);
+            padding: 16px 28px; font-size: 1.1rem; font-weight: bold; letter-spacing: 2px;
+            border-radius: 8px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
         }
+        .magic-btn:hover { box-shadow: 0 0 25px var(--gold-glow); background: var(--gold-primary); color: #0a0e17; transform: translateY(-2px); }
 
-        .magic-btn::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-            transform: rotate(45deg);
-            transition: 0.5s;
-        }
-
-        .magic-btn:hover::before {
-            left: 120%;
-        }
-
-        .magic-btn:hover {
-            box-shadow: 0 0 25px var(--gold-glow);
-            border-color: var(--gold-light);
-            transform: translateY(-2px);
-            text-shadow: 0 0 5px var(--gold-light);
-        }
-
-        /* 遊戲資訊面板 */
-        .info-panel {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 1px solid rgba(255,215,0,0.2);
-            padding-bottom: 12px;
-        }
-
-        .badge-level {
-            background: rgba(255, 215, 0, 0.15);
-            border: 1px solid var(--gold-light);
-            color: var(--gold-light);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            box-shadow: 0 0 8px rgba(255,215,0,0.2);
-        }
-
-        .hud-text {
-            font-size: 1rem;
-            color: #d1d8e0;
-        }
-
-        .hud-text span {
-            color: var(--gold-light);
-            font-weight: bold;
-        }
+        /* HUD 資訊面板 */
+        .info-panel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid rgba(212, 175, 55, 0.3); padding-bottom: 12px; }
+        .badge-level { background: var(--gold-primary); color: #0a0e17; padding: 6px 14px; border-radius: 4px; font-size: 0.95rem; font-weight: bold; box-shadow: 0 0 10px var(--gold-glow); }
+        .hud-text { font-size: 1rem; color: var(--text-light); }
+        .hud-text span { color: var(--gold-primary); font-weight: bold; }
 
         /* 進度條 */
-        .progress-container {
-            width: 100%;
-            height: 10px;
-            background: rgba(0,0,0,0.4);
-            border-radius: 5px;
-            margin-bottom: 25px;
-            overflow: hidden;
-            border: 1px solid rgba(255,215,0,0.1);
-        }
+        .progress-container { width: 100%; height: 10px; background: #0d131f; border-radius: 6px; margin-bottom: 25px; overflow: hidden; border: 1px solid rgba(212,175,55,0.2); }
+        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #f3edd7, var(--gold-primary)); box-shadow: 0 0 10px var(--gold-glow); transition: width 0.4s; }
 
-        .progress-bar {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--gold-dark), var(--gold-light));
-            box-shadow: 0 0 10px var(--gold-glow);
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        /* 題目核心區 */
+        .quiz-body { min-height: 280px; }
+        .question-text { font-size: 1.35rem; line-height: 1.6; margin-bottom: 25px; color: var(--text-light); border-left: 5px solid var(--gold-primary); padding-left: 15px; }
+        .options-list { display: flex; flex-direction: column; gap: 14px; }
+        .option-item { background: rgba(26, 35, 51, 0.7); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 8px; padding: 15px 20px; font-size: 1.05rem; cursor: pointer; transition: all 0.2s; }
+        .option-item:hover { background: rgba(38, 50, 72, 0.9); border-color: var(--gold-primary); padding-left: 26px; }
 
-        /* 題目核心 */
-        .quiz-body {
-            min-height: 280px;
-            position: relative;
-        }
+        /* 回饋與狀態 */
+        .option-item.correct { background: rgba(46, 204, 113, 0.25) !important; border-color: var(--correct-green) !important; color: var(--correct-green); font-weight: bold; }
+        .option-item.wrong { background: rgba(231, 76, 60, 0.25) !important; border-color: var(--wrong-red) !important; color: var(--wrong-red); }
+        .option-item.disabled { pointer-events: none; opacity: 0.4; }
+        .option-item.disabled.correct { opacity: 1; }
+        .option-item.vanished { opacity: 0 !important; pointer-events: none; transform: scale(0.8); transition: all 0.5s ease; }
 
-        .question-text {
-            font-size: 1.35rem;
-            line-height: 1.6;
-            margin-bottom: 25px;
-            color: var(--text-light);
-            text-shadow: 1px 1px 2px #000;
-        }
-
-        .options-list {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .option-item {
-            background: rgba(13, 27, 42, 0.6);
-            border: 1px solid rgba(255,215,0,0.3);
-            border-radius: 8px;
-            padding: 14px 20px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-        }
-
-        .option-item:hover {
-            background: rgba(27, 38, 59, 0.9);
-            border-color: var(--gold-light);
-            padding-left: 26px;
-            box-shadow: 0 0 12px rgba(255,215,0,0.1);
-        }
-
-        /* 選項反饋與彩蛋抹除樣式 */
-        .option-item.correct {
-            background: rgba(46, 204, 113, 0.25) !important;
-            border-color: var(--correct-green) !important;
-            color: var(--correct-green);
-            font-weight: bold;
-            box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
-        }
-
-        .option-item.wrong {
-            background: rgba(231, 76, 60, 0.25) !important;
-            border-color: var(--wrong-red) !important;
-            color: var(--wrong-red);
-            box-shadow: 0 0 15px rgba(231, 76, 60, 0.3);
-        }
-
-        .option-item.erased {
-            opacity: 0.15 !important;
-            pointer-events: none !important;
-            border-style: dashed !important;
-            text-decoration: line-through;
-            transform: scale(0.95);
-        }
-
-        .option-item.disabled {
-            pointer-events: none;
-            opacity: 0.6;
-        }
-
-        .option-item.disabled.correct {
-            opacity: 1;
-        }
-
-        /* 第 5 題限定彩蛋按鈕 */
-        .easter-egg-btn {
-            position: absolute;
-            bottom: -15px;
-            right: 0;
-            background: linear-gradient(135deg, #741212 0%, #3a0303 100%);
-            border: 2px solid #ff7675;
-            color: #ff7675;
-            padding: 8px 15px;
-            font-size: 0.9rem;
-            border-radius: 20px;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(255, 118, 117, 0.5);
-            font-weight: bold;
-            display: none;
-            z-index: 10;
-            animation: pulseGlow 2s infinite;
-            transition: all 0.3s;
-        }
-
-        .easter-egg-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px #ff7675;
-            color: #fff;
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 10px rgba(255, 118, 117, 0.5); }
-            50% { box-shadow: 0 0 25px rgba(255, 118, 117, 0.9); }
-        }
-
-        /* 回饋區塊 */
-        .feedback-panel {
-            margin-top: 25px;
-            background: rgba(10, 14, 20, 0.8);
-            border-radius: 8px;
-            padding: 20px;
-            border-left: 4px solid var(--gold-light);
-            display: none;
-            animation: slideUp 0.4s ease-out forwards;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .feedback-status {
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
+        .feedback-panel { margin-top: 25px; background: #0d131f; border-radius: 8px; padding: 20px; border-top: 4px solid var(--gold-primary); display: none; }
+        .feedback-status { font-size: 1.3rem; font-weight: bold; margin-bottom: 8px; }
         .feedback-status.is-correct { color: var(--correct-green); }
         .feedback-status.is-wrong { color: var(--wrong-red); }
+        .explanation-text { font-size: 0.95rem; color: var(--text-gray); line-height: 1.5; margin-bottom: 15px; }
 
-        .explanation-text {
-            font-size: 0.95rem;
-            color: #b2bec3;
-            line-height: 1.5;
-            margin-bottom: 15px;
+        /* 驚喜事件覆蓋層 */
+        .surprise-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(5, 8, 14, 0.95); z-index: 200;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.5s ease; padding: 20px; text-align: center;
+        }
+        .surprise-overlay.show { opacity: 1; pointer-events: auto; }
+        .surprise-title { font-size: 2.5rem; color: var(--gold-primary); text-shadow: 0 0 20px var(--gold-glow); margin-bottom: 15px; }
+        .surprise-desc { font-size: 1.2rem; margin-bottom: 30px; max-width: 500px; color: var(--text-light); line-height: 1.6; }
+
+        /* 開學通知信專用裝飾 */
+        .letter-particle {
+            position: absolute; width: 90px; height: 60px;
+            background: #f4ebd0; border: 2px solid #5c1d1d; border-radius: 4px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4); pointer-events: auto; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            transition: transform 0.2s, opacity 0.4s;
+        }
+        .letter-particle::after {
+            content: '✉'; font-size: 1.5rem; color: #5c1d1d;
+        }
+        .letter-popup-content {
+            background: #f4ebd0; color: #111; padding: 30px; border-radius: 4px;
+            box-shadow: 0 0 30px rgba(212,175,55,0.8); max-width: 450px; border: 3px double #5c1d1d;
+            display: none; animation: fadeIn 0.4s ease-out forwards;
         }
 
-        .next-btn-container {
-            display: flex;
-            justify-content: flex-end;
-        }
+        /* 排行榜與輸入 */
+        .board-table { width: 100%; border-collapse: collapse; margin-top: 15px; color: var(--text-light); }
+        .board-table th, .board-table td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(212,175,55,0.1); }
+        .board-table th { color: var(--gold-primary); border-bottom: 2px solid var(--gold-primary); }
+        .input-magic { background: #0d131f; border: 1px solid var(--gold-primary); color: white; padding: 12px 18px; font-size: 1.1rem; border-radius: 6px; width: 100%; margin-bottom: 20px; text-align: center; outline: none; }
+        .input-magic:focus { box-shadow: 0 0 15px var(--gold-glow); }
+        .final-score-callout { font-size: 2rem; color: var(--gold-primary); text-align: center; margin: 20px 0; text-shadow: 0 0 10px var(--gold-glow); }
+        .final-rank-title { font-size: 1.4rem; text-align: center; margin-bottom: 25px; }
 
-        /* 排行榜與命名彈窗 */
-        .board-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            color: #d1d8e0;
-        }
-
-        .board-table th, .board-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255,215,0,0.1);
-        }
-
-        .board-table th {
-            color: var(--gold-light);
-            border-bottom: 2px solid var(--gold-dark);
-        }
-
-        .board-table tr:nth-child(1) td { color: var(--gold-light); font-weight: bold; }
-        .board-table tr:nth-child(2) td { color: #f1c40f; }
-        .board-table tr:nth-child(3) td { color: #e67e22; }
-
-        .input-magic {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--gold-dark);
-            color: white;
-            padding: 12px 18px;
-            font-size: 1.1rem;
-            border-radius: 6px;
-            width: 100%;
-            margin-bottom: 20px;
-            text-align: center;
-            outline: none;
-        }
-
-        .input-magic:focus {
-            border-color: var(--gold-light);
-            box-shadow: 0 0 15px var(--gold-glow);
-        }
-
-        .final-score-callout {
-            font-size: 1.8rem;
-            color: var(--gold-light);
-            text-align: center;
-            margin: 20px 0;
-            text-shadow: 0 0 10px var(--gold-glow);
-        }
-
-        .final-rank-title {
-            font-size: 1.4rem;
-            text-align: center;
-            margin-bottom: 25px;
-            color: #fff;
-        }
-
-        /* 全螢幕爆光特效面版 */
-        #flash-overlay {
-            position: fixed;
-            top:0; left:0; width:100vw; height:100vh;
-            pointer-events: none;
-            z-index: 99;
-            opacity: 0;
-            transition: opacity 0.1s ease;
-        }
-
-        @media(max-width: 600px) {
-            .game-wrapper { padding: 20px 15px; }
-            .title-banner h1 { font-size: 1.6rem; }
-            .question-text { font-size: 1.15rem; }
-            .option-item { font-size: 1rem; padding: 12px 15px; }
-            .media-controller { top: auto; bottom: 15px; right: 15px; }
-            .main-logo-img { max-width: 240px; }
-        }
+        #flash-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; pointer-events: none; z-index: 99; opacity: 0; transition: opacity 0.1s; }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="bg-container"></div>
     <div class="bg-overlay"></div>
-    <canvas id="particles"></canvas>
+    <canvas id="magic-particles"></canvas>
     <div id="flash-overlay"></div>
 
-    <!-- 背景音樂播放器載體 -->
+    <!-- 背景音樂載體 (霍格華茲經典配樂原聲帶) -->
     <iframe id="yt-player-raw" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;" 
-            src="https://www.youtube.com/embed/E2vo0qvKGCM?enablejsapi=1&autoplay=0&controls=0&loop=1&playlist=E2vo0qvKGCM&rel=0" 
+            src="https://www.youtube.com/embed/yPZUAb82Kuc?enablejsapi=1&autoplay=0&controls=0&loop=1&playlist=yPZUAb82Kuc&rel=0" 
             frameborder="0" allow="autoplay"></iframe>
 
-    <!-- 影音控制組 -->
     <div class="media-controller">
         <button class="media-btn" id="mute-toggle-btn" onclick="toggleMute()">🔊</button>
-        <input type="range" class="volume-slider" id="vol-ctrl" min="0" max="100" value="50" oninput="changeVolume(this.value)">
+        <input type="range" class="volume-slider" id="vol-ctrl" min="0" max="100" value="40" oninput="changeVolume(this.value)">
+    </div>
+
+    <!-- 驚喜事件動態覆蓋層 -->
+    <div class="surprise-overlay" id="surprise-screen">
+        <div id="surprise-dynamic-content">
+            <!-- 驚喜內容動態注入 -->
+        </div>
     </div>
 
     <!-- 主選單視圖 -->
     <div class="game-wrapper active-view" id="view-home">
-        <!-- 【新導入】Pro Max 尊爵版金底 Logo 圖片 -->
         <div class="main-logo-holder">
-            <img src="https://www.nlpi.edu.tw/FileDownLoad/MovieFestival/20191210083945443.JPG" alt="哈利波特Logo" class="main-logo-img">
+            <img src="https://img.linetv.tw/large/drama/12888-p_211127.jpg" alt="Hogwarts Crest" class="main-logo-img">
         </div>
         <div class="title-banner">
-            <h1>哈利波特終極測驗</h1>
-            <p>50題巫師完整 Pro Max 旗艦資料庫</p>
+            <h1>✨ 哈利波特：究極終端魔幻測驗</h1>
+            <p>50題 驚喜極限版</p>
         </div>
         <div class="btn-stack">
-            <button class="magic-btn" onclick="switchView('view-setup')">開始測驗</button>
-            <button class="magic-btn" onclick="showRankingsView()">查看排行榜</button>
-            <button class="magic-btn" style="border-color:#7f8c8d; color:#bdc3c7;" onclick="clearRankings()">重設排行榜</button>
+            <button class="magic-btn" onclick="switchView('view-setup')">🔮 開始入學測驗</button>
+            <button class="magic-btn" onclick="showRankingsView()">🏆 巫師名人堂</button>
+            <button class="magic-btn" style="border-color:#555; color:#888;" onclick="clearRankings()">🗑 清除紀錄</button>
         </div>
     </div>
 
-    <!-- 填寫名稱視圖 -->
+    <!-- 註冊名稱視圖 -->
     <div class="game-wrapper" id="view-setup">
-        <div class="main-logo-holder">
-            <img src="https://www.nlpi.edu.tw/FileDownLoad/MovieFestival/20191210083945443.JPG" alt="哈利波特Logo" class="main-logo-img">
-        </div>
         <div class="title-banner">
-            <h1>登錄魔法部</h1>
-            <p>請寫下魔杖持有者的真實姓名</p>
+            <h1>魔杖選擇儀式</h1>
+            <p>請在羊皮紙上簽署你的巫師大名</p>
         </div>
         <div style="margin-top: 20px;">
-            <input type="text" id="player-name-input" class="input-magic" placeholder="輸入您的巫師名稱..." maxlength="12">
+            <input type="text" id="player-name-input" class="input-magic" placeholder="例如：哈利波特..." maxlength="12">
             <div class="btn-stack">
                 <button class="magic-btn" onclick="initiateQuizGame()">進入霍格華茲</button>
-                <button class="magic-btn" style="border-color:#7f8c8d; color:#bdc3c7;" onclick="switchView('view-home')">返回主選單</button>
+                <button class="magic-btn" style="border-color:#555; color:#aaa;" onclick="switchView('view-home')">返回大廳</button>
             </div>
         </div>
     </div>
 
-    <!-- 核心問答視圖 -->
+    <!-- 問答視圖 -->
     <div class="game-wrapper" id="view-quiz">
         <div class="info-panel">
-            <div id="hud-level-badge" class="badge-level">🔥 夯</div>
-            <div class="hud-text">
-                <!-- 【小彩蛋】內頁標籤同步整合微型識別章 -->
-                <img src="https://www.nlpi.edu.tw/FileDownLoad/MovieFestival/20191210083945443.JPG" class="mini-logo-inline" alt="mini-logo">
-                目前分數: <span id="hud-score-counter">0</span> / 50
-            </div>
+            <div id="hud-level-badge" class="badge-level">🧙‍♂️ 一年級生</div>
+            <div class="hud-text">學院積分: <span id="hud-score-counter">0</span> / 50</div>
             <div class="hud-text">進度: <span id="hud-index-counter">1</span> / 50</div>
         </div>
         <div class="progress-container">
@@ -580,314 +278,245 @@
         </div>
 
         <div class="quiz-body">
-            <div id="question-box" class="question-text">載入題目中...</div>
-            <div id="options-box" class="options-list">
-                <!-- 動態注入選項 -->
-            </div>
-            <!-- 第 5 題限定消去法彩蛋按鈕 -->
-            <button id="reparo-egg-btn" class="easter-egg-btn" onclick="triggerReparoMagic()">🪄 施展「復復修」消去法</button>
+            <div id="question-box" class="question-text">正在調配魔藥...</div>
+            <div id="options-box" class="options-list"></div>
         </div>
 
         <div id="feedback-box" class="feedback-panel">
-            <div id="feedback-alert" class="feedback-status">✓ 正確！</div>
-            <div id="explanation-box" class="explanation-text">解析內容</div>
-            <div class="next-btn-container">
-                <button class="magic-btn" style="padding: 10px 24px; font-size:1rem;" onclick="advanceNextQuestion()">下一題</button>
+            <div id="feedback-alert" class="feedback-status">✨ 完美的咒語！</div>
+            <div id="explanation-box" class="explanation-text">解析</div>
+            <div style="display:flex; justify-content: flex-end;">
+                <button class="magic-btn" style="padding: 10px 24px; font-size:1rem;" id="next-btn-trigger" onclick="advanceNextQuestion()">前進下一題</button>
             </div>
         </div>
     </div>
 
-    <!-- 結算總分視圖 -->
+    <!-- 結算視圖 -->
     <div class="game-wrapper" id="view-result">
-        <div class="main-logo-holder">
-            <img src="https://www.nlpi.edu.tw/FileDownLoad/MovieFestival/20191210083945443.JPG" alt="哈利波特Logo" class="main-logo-img">
-        </div>
         <div class="title-banner">
-            <h1>測驗完成</h1>
-            <p>大難不死的男孩見證了你的成績</p>
+            <h1>普等巫術測驗 (O.W.Ls) 報告</h1>
+            <p>你的魔法天賦評定結果已出爐</p>
         </div>
         <div class="final-score-callout">
-            總分：<span id="final-score-num">0</span> / 50
+            最終獲得積分：<span id="final-score-num">0</span> / 50
         </div>
-        <div id="final-rank-badge" class="final-rank-title">
-            評定稱號：🏆 霍格華茲傳奇
+        <div id="final-rank-badge" class="final-rank-title" style="color: var(--gold-primary);">
+            榮獲稱號：🧙‍♂️ 梅林勳章一級大法師
         </div>
         <div class="btn-stack">
-            <button class="magic-btn" onclick="switchView('view-home')">返回主選單</button>
+            <button class="magic-btn" onclick="switchView('view-home')">重返霍格華茲特快車</button>
         </div>
     </div>
 
     <!-- 排行榜視圖 -->
     <div class="game-wrapper" id="view-rank">
         <div class="title-banner">
-            <h1>🏆 魔法部名人堂</h1>
-            <p>前 10 名頂尖巫師排行</p>
+            <h1>🏆 頂尖魔法師石碑</h1>
+            <p>前 10 名最高積分大巫師</p>
         </div>
-        <div style="max-height: 320px; overflow-y: auto;">
-            <table class="board-table">
-                <thead>
-                    <tr>
-                        <th>名次</th>
-                        <th>巫師名稱</th>
-                        <th>得分</th>
-                        <th>日期</th>
-                    </tr>
-                </thead>
-                <tbody id="rank-table-body">
-                    <!-- 動態注入排行 -->
-                </tbody>
-            </table>
-        </div>
+        <table class="board-table">
+            <thead>
+                <tr>
+                    <th>排名</th>
+                    <th>巫師姓名</th>
+                    <th>積分</th>
+                    <th>日期</th>
+                </tr>
+            </thead>
+            <tbody id="rank-table-body"></tbody>
+        </table>
         <div class="btn-stack" style="margin-top: 30px;">
-            <button class="magic-btn" onclick="switchView('view-home')">返回主選單</button>
+            <button class="magic-btn" onclick="switchView('view-home')">返回大廳</button>
         </div>
     </div>
 
     <script>
         // ==========================================
-        // 1. 完整 50 題題庫定義陣列
+        // 1. 完整 50 題魔法題庫
         // ==========================================
         const quizDatabase = [
-            { q: "請問哈利波特在霍格華茲就讀時，他所屬的學院校徽上是一隻什麼動物？", a: "鷹", b: "蛇", c: "獅子", d: "獾", ans: "C", exp: "哈利所屬的葛來分多學院以獅子為象徵物，代表勇敢與膽識。" },
-            { q: "佛地魔的本名是什麼？", a: "蓋勒·葛林戴華德", b: "湯姆·魔佛羅·瑞斗", c: "魯休思·馬份", d: "巴提·柯羅奇", ans: "B", exp: "重組湯姆·魔佛羅·瑞斗（Tom Marvolo Riddle）的字母可得到「我是佛地魔」的宣告。" },
-            { q: "哈利第一根魔杖核心是什麼？", a: "龍的心臟神經", b: "鳳凰羽毛", c: "獨角獸毛", d: "迷拉頭髮", ans: "B", exp: "哈利魔杖核心為佛克斯的鳳凰羽毛，與佛地魔的魔杖核心共生。" },
-            { q: "霍格華茲魔法學校的校長阿不思·鄧不利多，全名中不包含以下哪一個名字？", a: "博知維", b: "沃夫林", c: "蓋勒", d: "布萊恩", ans: "C", exp: "他的全名為阿不思·博知維·沃夫林·布萊恩·鄧不利多，蓋勒是葛林戴華德的名字。" },
-            { q: "海格在哈利十一歲生日時送給他的貓頭鷹名叫什麼？（提示：本題有魔法彩蛋！）", a: "朱頭", b: "嘿美", c: "克魯克山", d: "蘿莉絲夫人", ans: "B", exp: "嘿美（Hedwig）是哈利忠實的雪鴞，一路陪伴他直到最後大戰。" },
-            { q: "在《神祕的魔法石》中，保護魔法石的三頭巨犬被海格稱為什麼名字？", a: "尖牙", b: "毛毛", c: "路威", d: "諾伯", ans: "C", exp: "海格將其命名為「路威」（Fluffy），只要聽到音樂就會睡著。" },
-            { q: "榮恩·衛斯理的長鼠斑斑，真實身份是哪一位食死人？", a: "彼得·佩迪魯", b: "天狼星·布萊克", c: "雷木思·路平", d: "巴提·柯羅奇二世", ans: "A", exp: "化鼠多年的阿尼馬格斯彼得·佩迪魯（蟲尾），是出賣哈利父母的叛徒。" },
-            { q: "妙麗·格蘭傑利用什麼魔法道具，得以在三年級同時修讀多門課程？", a: "時光器", b: "儲思盆", c: "咆哮信", d: "熄燈器", ans: "A", exp: "麥教授破例向魔法部申請了時光器給妙麗，讓她能進行時間旅行修課。" },
-            { q: "哈利波特的護法是一隻什麼動物？", a: "水獺", b: "銀兔", c: "雄鹿", d: "牝鹿", ans: "C", exp: "哈利的護法是承襲父親詹姆的阿尼馬格斯型態——雄鹿（Prongs）。" },
-            { q: "將哈利名字投入火盃，強迫他參與三巫鬥法大賽的幕後黑手是誰？", a: "卡卡洛夫", b: "假扮成穆敵的巴提·柯羅奇二世", c: "皮皮鬼", d: "石內卜", ans: "B", exp: "巴提·柯羅奇二世使用變身水偽裝成瘋眼穆敵，暗中策劃將哈利送至復活儀式。" },
-            { q: "請問開啟密室的繼承人必備的語言天賦稱之為？", a: "爬說語", b: "人魚語", c: "妖精語", d: "巨怪語", ans: "A", exp: "爬說語（Parseltongue）是與蛇溝通的語言，為薩拉札·史萊哲林一脈的特徵。" },
-            { q: "雷文克勞學院的創辦人是誰？", a: "羅威娜·雷文克勞", b: "海蓮娜·雷文克勞", c: "碧雅翠絲·波特", d: "葛帝林·雷文克勞", ans: "A", exp: "羅威娜·雷文克勞是創辦人，海蓮娜是其女兒（即灰衣貴婦）。" },
-            { q: "雷木思·路平教授是一位遭受詛咒的？", a: "吸血鬼", b: "狼人", c: "報喪女妖", d: "惡魔", ans: "B", exp: "路平幼年被焚銳·灰背咬傷從此成為狼人，需定期服用渾拼柳與縛狼汁。" },
-            { q: "在《阿茲卡班的逃犯》中，哈利在騎士公車上使用了哪一個假名？", a: "榮恩·衛斯理", b: "內維爾·隆巴頓", c: "威爾·達利", d: "迪哥里", ans: "C", exp: "哈利為了掩人耳目，對車掌史坦·桑派聲稱自己叫做威爾·達利。" },
-            { q: "佛地魔的分靈體中，哪一個是赫夫帕夫的遺物？", a: "小金匣", b: "金杯", c: "王冕", d: "戒指", ans: "B", exp: "海加·赫夫帕夫的金杯被留傳下來，後被貝拉·雷斯壯存於古靈閣中。" },
-            { q: "天狼星·布萊克在阿尼馬格斯狀態下會變成一隻什麼顏色的巨犬？", a: "白色", b: "灰色", c: "黑色", d: "棕色", ans: "C", exp: "天狼星的外號叫大腳板，變身後是一隻如同大腳黑狗般的巨犬。" },
-            { q: "請問雷文克勞的創辦人遺留下來、具有增長智慧魔力的寶物是什麼？", a: "王冕", b: "寶劍", c: "掛飾", d: "復活石", ans: "A", exp: "羅威娜·雷文克勞的王冕藏於萬應室中，後被佛地魔改造成分靈體。" },
-            { q: "魔法世界中，古靈閣巫師銀行是由哪一種生物負責營運維護的？", a: "家庭小精靈", b: "妖精", d: "巨人", c: "人馬", ans: "B", exp: "妖精控制著古靈閣，並掌握著獨特的冶金魔法技術。" },
-            { q: "賽佛勒斯·石內卜在擔任萬應室與史萊哲林導師之前，一直擔任什麼科目的教授？", a: "黑魔法防禦術", b: "藥草學", c: "魔藥學", d: "占卜學", ans: "C", exp: "石內卜多年擔任魔藥學教授，直到六年級才如願接任黑魔法防禦術。" },
-            { q: "魔法部部長康尼留斯·夫子在對抗佛地魔崛起時，曾表現出極度的？", a: "英勇抗敵", b: "逃避不信", c: "直接投降", d: "退隱江湖", ans: "B", exp: "夫子因恐懼權力動搖，長期否認佛地魔復活的真相，並抹黑鄧不利多與哈利。" },
-            { q: "哈利波特一入學便展現出高超飛行天賦，在魁地奇球隊中負責什麼位置？", a: "追蹤手", b: "看守手", c: "搜捕手", d: "打擊手", ans: "C", exp: "哈利擔任搜捕手（Seeker），負責在球場上尋找並捕捉金探子。" },
-            { q: "九又四分之三月台位於倫敦的哪一個火車站內？", a: "國王十字車站", b: "維多利亞車站", c: "滑鐵盧車站", d: "聖潘克拉斯車站", ans: "A", exp: "巫師需穿越國王十字車站（King's Cross）第九與第十月台之間的磚牆屏障。" },
-            { q: "妙麗的家長在麻瓜世界中是從事什麼職業的？", a: "律師", b: "牙醫", c: "大學教授", d: "工程師", ans: "B", exp: "格蘭傑夫婦在麻瓜社會均為執業牙醫，這讓巫師界對牙齒保健感到新奇。" },
-            { q: "請問下列哪一種植物具有能緊緊纏繞並勒死受害者的特性，且懼怕陽光？", a: "曼德拉草", b: "毒觸手", c: "魔鬼網", d: "渾拼柳", ans: "C", exp: "魔鬼網（Devil's Snare）會緊縛獵物，妙麗利用魔法火焰產生的強光擊退它。" },
-            { q: "鄧不利多的軍隊（D.A.）在五年級時是為了對抗哪一位教授的獨裁統治而建立的？", a: "奎若教授", b: "桃樂絲·恩不里居", c: "吉德羅·洛哈", d: "阿拉特·穆敵", ans: "B", exp: "恩不里居限制實作魔法，哈利在妙麗提議下組織了非法防禦術學習會。" },
-            { q: "哈利第一把獲得的頂級飛天掃帚是？", a: "狂風七號", b: "光輪2000", c: "火閃電", d: "彗星260", ans: "B", exp: "麥教授破格錄取哈利進球隊後，秘密贈送了他一把當時最快的光輪2000。" },
-            { q: "死神的三件聖物分別為：接骨木魔杖、復活石以及什麼？", a: "隱形斗篷", b: "魔法石", c: "劫盜地圖", d: "寶劍", ans: "A", exp: "死神聖物三件套包含了隱形斗篷，是由皮福雷三兄弟流傳下來的聖物。" },
-            { q: "在《混血王子的背叛》中，石內卜教授吩咐哈利去查閱誰留下來的魔藥學課本？", a: "詹姆·波特", b: "混血王子", c: "莉莉·伊凡", d: "斯拉格霍恩", ans: "B", exp: "哈利拿到了署名為「混血王子」（石內卜筆名）的舊課本，從而獲得許多獨門秘笈。" },
-            { q: "赫夫帕夫學院的代表顏色是什麼？", a: "藍與青銅", b: "黃與黑", c: "綠與銀", d: "紅與金", ans: "B", exp: "赫夫帕夫採用黃色與黑色為代表色，象徵著泥土、勤奮與忠誠。" },
-            { q: "請問衛斯理家會飛的魔法汽車是什麼車款？", a: "福特安格利亞 (Ford Anglia)", b: "勞斯萊斯", c: "賓士", d: "福斯金龜車", ans: "A", exp: "亞瑟·衛斯理改造了一輛福特安格利亞藍色汽車，具有隱形與飛行的能力。" },
-            { q: "魔法世界中，能讓人產生極致好運的魔藥被稱疑問？", a: "迷幻藥", b: "福靈劑", c: "變身水", d: "吐真劑", ans: "B", exp: "福靈劑（Felix Felicis）又稱幸運水，飲用後在一段時間內做任何事都會成功。" },
-            { q: "哈利波特額頭上的疤痕是什麼形狀？", a: "閃電狀", b: "星星狀", c: "魔杖狀", d: "圓圈狀", ans: "A", exp: "佛地魔對哈利施展索命咒遭反彈，在哈利額頭上留下一道蘊含靈魂碎片的閃電疤痕。" },
-            { q: "鄧不利多的鳳凰叫做什麼名字？", a: "諾伯", b: "佛克斯", c: "巴嘴", d: "阿辣哥", ans: "B", exp: "鳳凰佛克斯（Fawkes）多次拯救哈利，並在鄧不利多去世後高唱輓歌離去。" },
-            { q: "巫師要前往魔法部，在麻瓜倫敦街道上的公共電話亭應撥打什麼號碼？", a: "911", b: "62442", c: "999", d: "007", ans: "B", exp: "撥打「62442」代表拼出字母「MAGIC」（魔法），即可啟動訪客電梯。" },
-            { q: "請問下列哪一個是不赦咒之一，能強行控制受害者意志？", a: "茲茲·呀呀", b: "蠻橫咒", c: "哆哆失", d: "速速前", ans: "B", exp: "蠻橫咒（Imperio）是三大不赦咒之一，能徹底剝奪他人自由意志，使其唯命是從。" },
-            { q: "海格在禁忌森林裡飼養的巨大八眼巨蛛名叫什麼？", a: "毛毛", b: "阿辣哥", c: "路威", d: "尖牙", ans: "B", exp: "八眼巨蛛阿辣哥（Aragog）由海格自幼撫養，視海格為唯一不傷害的人類。" },
-            { q: "三巫鬥法大賽中，代表德姆蘭魔法學校的勇士是哪位明星魁地奇球員？", a: "西追·迪哥里", b: "維克多·喀浪", c: "花兒·戴樂古", d: "奧立佛·木透", ans: "B", exp: "維克多·喀浪是保加利亞國家隊的明星搜捕手，也是德姆蘭的火盃勇士。" },
-            { q: "請問對抗幻形怪時，巫師應該高喊什麼咒語使其變得滑稽逗趣？", a: "疾疾護法現身", b: "叱叱荒唐", c: "去去武器走", d: "溫咖癲啦唯啊薩", ans: "B", exp: "「叱叱荒唐」（Riddikulus）可以摧毀幻形怪帶來的恐懼，將其轉化為荒謬好笑的型態。" },
-            { q: "阿茲卡班監獄是由哪一種邪惡、吸食人類快樂記憶的生物看守？", a: "催狂魔", b: "食死人", c: "巨怪", d: "妖精", ans: "A", exp: "催狂魔（Dementor）是與黑暗共生的生物，以吸食人類的希望、快樂與靈魂為生。" },
-            { q: "石內卜教授的護法與哈利的母親莉莉完全相同，是一隻？", a: "雄鹿", b: "牝鹿", c: "天鵝", d: "貓頭鷹", ans: "B", exp: "石內卜一生深愛莉莉·伊凡，他的護法因此化為一隻銀白色的牝鹿（Doe）。" },
-            { q: "哈利波特在依循遺囑獲贈的熄燈器，原主人是誰？", a: "阿不思·鄧不利多", b: "蓋勒·葛林戴華德", c: "紐特·斯卡曼德", d: "小天狼星布萊克", ans: "A", exp: "鄧不利多在遺囑中將他親手發明的熄燈器留給了榮恩·衛斯理。" },
-            { q: "霍格華茲廚房中，大量從事烹飪與清潔工作的隱形勞動者是？", a: "家庭小精靈", b: "地精", c: "皮皮鬼", d: "矮人", ans: "A", exp: "霍格華茲擁有上百名全英國最龐大的家庭小精靈團隊，在廚房默默工作。" },
-            { q: "請問鄧不利多的妹妹阿蕊安娜，極可能是一位因壓抑魔法而產生的？", a: "闇黑怨靈", b: "爆竹", c: "化獸師", d: "破心者", ans: "A", exp: "阿蕊安娜幼年受麻瓜侵害後精神受創，無法控制魔法而體內滋生怨靈。" },
-            { q: "佛地魔曾用哪一個名字在博金－博克商店擔任過收購夥計？", a: "蓋勒", b: "湯姆·瑞斗", c: "魔佛羅", d: "小巴提", ans: "B", exp: "畢業後的湯姆·瑞斗拒絕了魔法部職缺，前往夜行巷尋找古老魔法遺物。" },
-            { q: "哈利父母在戈德里克山谷的保密人原本是天狼星，後來偷偷換成了誰？", a: "盧平", b: "彼得·佩迪魯", c: "石內卜", d: "鄧不利多", ans: "B", exp: "天狼星認為自己目標太大，建議換成不起眼的蟲尾彼得，卻未料遭到背叛。" },
-            { q: "妙麗格蘭傑的魔法護法是一隻什麼動物？", a: "貓", b: "水獺", c: "兔子", d: "狐狸", ans: "B", exp: "妙麗的護法是一隻水獺（Otter），代表著靈巧、聰慧與活力。" },
-            { q: "請問佛地魔寄宿在哈利體內的靈魂碎片，是在哪一個事件中被佛地魔親手摧毀的？", a: "密室被蛇妖咬傷", b: "禁忌森林索命咒對決", c: "神祕部門大戰", d: "火盃大賽復活夜", ans: "B", exp: "佛地魔在禁忌森林用接骨木魔杖對哈利施展索命咒，正好殺死了自己依附在哈利身上的靈魂碎片。" },
-            { q: "尼樂·勒梅是魔法世界中唯一已知的什麼製造者？", a: "魔法石", b: "万应室", c: "隱形斗篷", d: "時光器", ans: "A", exp: "煉金術士尼樂·勒梅成功製造出魔法石，能點石成金並提煉長生不老藥。" },
-            { q: "雷文克勞學院的幽靈「灰衣貴婦」，真實姓名是什麼？", a: "胖女士", b: "海蓮娜·雷文克勞", c: "血腥男爵", d: "Helena Potter", ans: "B", exp: "灰衣貴婦是海蓮娜·雷文克勞，因偷走母親的王冕而逃亡，後被血腥男爵所殺。" },
-            { q: "在全書的結尾，哈利波特的長子被命名為什麼名字？", a: "詹姆·天狼星·波特", b: "阿不思·賽佛勒斯·波特", c: "莉莉·露娜·波特", d: "弗雷·波特", ans: "B", exp: "哈利以兩位霍格華茲偉大校長的名字命名次子，而長子則名為詹姆·天狼星·波特。" }
+            { q: "哈利波特在霍格華茲入學通知信上，第一封信寄到的房間是？", a: "樓梯下的碗櫥", b: "水蠟樹街四號二樓臥室", c: "破釜酒吧11號房", d: "地窖", ans: "A", exp: "哈利最初與德思禮一家同住時，睡在樓梯下的狹小碗櫥內。" },
+            { q: "佛地魔在學生時代的名字是什麼？", a: "蓋勒·葛林戴華德", b: "湯姆·馬佛魯·瑞斗", c: "海帕夏·史密斯", d: "巴提·柯羅奇", ans: "B", exp: "佛地魔本名湯姆·瑞斗，後來他將名字重組為「我是佛地魔王」。" },
+            { q: "鄧不利多辦公室的入口守門石雕是什麼生物？", a: "鳳凰", b: "滴水嘴石獸", c: "三頭犬", d: "人面獅身獸", ans: "B", exp: "校長室入口是一隻巨大的滴水嘴石獸，對牠說出正確的甜點密碼才會讓路。" },
+            { q: "魔法世界中，要進入斜角巷需要用魔杖敲擊破釜酒吧後牆的哪一塊磚？", a: "垃圾桶上方往上三塊、往右兩塊", b: "地面往上五塊", c: "正中央那一塊", d: "左側角落倒數第三塊", ans: "A", exp: "用魔杖在垃圾桶上方往上數三塊、再往右數兩塊的磚牆上敲三下，斜角巷的通道就會開啟。" },
+            { q: "哈利波特的護法是一隻什麼動物？", a: "水獺", b: "雄鹿", c: "牝鹿", d: "狼", ans: "B", exp: "哈利繼承了他父親詹姆·波特的護法形態——一隻雄鹿。" },
+            { q: "榮恩·衛斯理的長兄「比爾·衛斯理」在古靈閣擔任什麼職務？", a: "馴龍師", b: "解咒師", c: "財富主管", d: "大堂守衛", ans: "B", exp: "比爾在埃及為古靈閣擔任解咒師，負責破解古墓中的惡咒。" },
+            { q: "妙麗·格蘭傑的父母在麻瓜世界從事什麼職業？", a: "大學教授", b: "牙醫", c: "律師", d: "銀行家", ans: "B", exp: "妙麗的雙親都是麻瓜界的牙醫，這讓巫師世界的人感到十分新奇。" },
+            { q: "下列哪一樣不是佛地魔的「分靈體」之一？", a: "雷文克勞的王冕", b: "赫夫帕夫的金杯", c: "葛來分多的寶劍", d: "馬佛魯·瑞斗的戒指", ans: "C", exp: "葛來分多寶劍吸取了蛇毒，只能用來破壞分靈體，它本身絕對不曾成為分靈體。" },
+            { q: "阿茲卡班監獄的看守者是哪種令人絕望的生物？", a: "催狂魔", b: "爆尾釘蝦", c: "地獄三頭犬", d: "惡魔藤", ans: "A", exp: "催狂魔會吸食人類所有的快樂與希望，是阿茲卡班最恐怖的看守者。" },
+            { q: "路平教授在三年級黑魔法防禦術課堂上，教大家用什麼咒語對付「幻形怪」？", a: "去去武器走", b: "叱叱荒唐", c: "疾疾護法現身", d: "溫咖癲啦唯啊薩", ans: "B", exp: "對付幻形怪需要使用「叱叱荒唐 (Riddikulus)」，將恐懼的化身變成好笑的模樣。" },
+            { q: "妙麗在三年級時為了能同時修完所有課程，使用了什麼魔法道具？", a: "意之鏡", b: "時光器", c: "儲思盆", d: "全知之眼", ans: "B", exp: "麥教授向魔法部特許申請了「時光器」，讓妙麗能夠進行時間穿梭來上課。" },
+            { q: "海格在霍格華茲培育、前半身是老鷹、後半身是馬的奇獸叫作？", a: "騎士墜鬼馬", b: "鷹馬（巴嘴）", c: "獅鷲", d: "報喪女妖", ans: "B", exp: "巴嘴是一隻「鷹馬（Hippogriff）」，接近牠必須先鞠躬表示尊敬。" },
+            { q: "哈利波特在三年級得到的奇特地圖「劫盜地圖」其四位創造者是誰？", a: "月影、獸足、蟲尾、鹿角", b: "鳳凰、毒蛇、獾王、鷹后", c: "瘋眼、小天狼星、詹姆、莉莉", d: "鄧不利多、格林戴華德、佛地魔、史拉轟", ans: "A", exp: "這四人分別是路平（月影）、小天狼星（獸足）、彼得（蟲尾）與詹姆（鹿角）。" },
+            { q: "魁地奇比賽中，抓到「金探子」可以獲得多少分？", a: "50分", b: "150分", c: "100分", d: "200分", ans: "B", exp: "抓到金探子不僅能為球隊直接帶來 150 分，同時也代表比賽立刻結束。" },
+            { q: "榮恩·衛斯理養了多年的寵物老鼠「斑斑」，真實身份是誰？", a: "天狼星·布萊克", b: "彼得·佩迪魯", c: "巴提·柯羅奇二世", d: "蓋勒·葛林戴華德", ans: "B", exp: "斑斑真實身份是化獸師彼得·佩迪魯，他是當年出賣哈利父母的真正叛徒。" },
+            { q: "海格在禁忌森林裡飼養的巨大八眼巨蛛叫作什麼名字？", a: "阿辣哥", b: "諾伯", c: "毛毛", d: "路威", ans: "A", exp: "阿辣哥是海格學生時代私下飼養的八眼巨蛛，繁衍出龐大的蜘蛛家族。" },
+            { q: "要讓「渾拚柳」停止瘋狂擺動攻擊，需要按下牠身上的哪一個部位？", a: "樹幹底部的某個節瘤", b: "最頂端的葉子", c: "左側第三根樹枝", d: "樹根正中央", ans: "A", exp: "只要用長棍按下渾拚柳樹根附近的某個特殊節瘤，牠就會瞬間靜止。" },
+            { q: "三巫鬥法大賽中，用來選拔各校參賽代表選手的魔法道具是？", a: "分類帽", b: "火盃", c: "預言球", d: "魔法石", ans: "B", exp: "「火盃」是公正不阿的裁判，會吐出寫有獲選代表巫師名字的羊皮紙。" },
+            { q: "佛地魔的貼身寵物巨蛇、同時也是他分靈體之一的名字是？", a: "巴西蟒蛇", b: "娜吉妮", c: "蛇妖", d: "薩拉查", ans: "B", exp: "巨蛇娜吉妮（Nagini）與佛地魔形影不離，最終在終局之戰被奈威用葛來分多寶劍斬殺。" },
+            { q: "哈利波特第一次參加三巫鬥法大賽第一個關卡時，抽到要對付哪一種龍？", a: "中國火球龍", b: "匈牙利角尾龍", c: "瑞典短吻龍", d: "威爾斯綠龍", ans: "B", exp: "哈利極其不幸地抽中了四隻龍中最凶暴、最危險的「匈牙利角尾龍」。" },
+            { q: "衛斯理雙胞胎（弗雷與喬治）發明的惡作劇糖果中，會讓人大量流鼻血的是？", a: "發燒糖", b: "鼻血牛軋糖", c: "嘔吐片", d: "昏迷花糖", ans: "B", exp: "速效逃課糖系列中的「鼻血牛軋糖（Bleeding Nose Nougat）」吃了會流出止不住的鼻血。" },
+            { q: "鳳凰會的總部最初設立在倫敦的哪一個地方？", a: "古里摩街12號", b: "水蠟樹街四號", c: "洞穴屋", d: "高錐客洞", ans: "A", exp: "古里摩街12號是布萊克家族的祖產，被小天狼星提供給鳳凰會作為祕密總部。" },
+            { q: "天狼星·布萊克在魔法部神祕部門的哪一個房間戰死？", a: "預言廳", b: "死刑室（帶有拱門帷幔的房間）", c: "時間廳", d: "大腦廳", ans: "B", exp: "小天狼星在有著神祕死帷幔拱門的死刑室中，被貝拉·雷斯壯擊中並跌入帷幔後消失。" },
+            { q: "哈利波特五年級時，組織的地下防禦術練習學會叫作什麼名字？", a: "鄧不利多的軍隊 (D.A.)", b: "鳳凰會幼苗團", c: "反烏姆里奇陣線", d: "聖徒", ans: "A", exp: "為了反抗烏姆里奇不教實戰咒語，金妮提議命名為「鄧不利多的軍隊（Dumbledore's Army）」。" },
+            { q: "石內卜教授在擔任食死人與鳳凰會雙面諜時，他的護法形態是什麼？", a: "雄鹿", b: "牝鹿", c: "銀狼", d: "蝙蝠", ans: "B", exp: "因為石內卜終生深愛著莉莉·波特，所以他的護法與莉莉一模一樣，是一隻「牝鹿」。" },
+            { q: "混血王子的魔法書原本是屬於誰的？", a: "賽佛勒斯·石內卜", b: "湯姆·瑞斗", c: "阿不思·鄧不利多", d: "路平教授", ans: "A", exp: "石內卜的母親姓混血「普林斯（Prince，意同王子）」，所以他上學時自稱「混血王子」。" },
+            { q: "第六集中，鄧不利多帶哈利去說服哪一位前教授重返霍格華茲任教？", a: "雷平教授", b: "赫瑞司·史拉轟", c: "奇洛教授", d: "阿拉特·穆敵", ans: "B", exp: "鄧不利多親自出馬，利用哈利作為誘餌，成功說服愛才的史拉轟教授回歸執教魔藥學。" },
+            { q: "伏地魔用哪一種魔藥設下機關來保護他的分靈體（掛墜盒）？", a: "迷幻劑", b: "絕望藥水（絕望之飲）", c: "生骨靈", d: "吐真劑", ans: "B", exp: "藏在海邊洞穴的分靈體被絕望藥水覆蓋，必須全部喝下才能拿到，會讓人產生極度痛苦與幻覺。" },
+            { q: "鄧不利多最終在天文塔上被誰施展「阿哇呾喀呾啦」擊落致死？", a: "跩哥·馬份", b: "賽佛勒斯·石內卜", c: "貝拉·雷斯壯", d: "死神", ans: "B", exp: "這是鄧不利多與石內卜提前策劃好的計畫，為了保護馬份的靈魂並取得佛地魔的絕對信任。" },
+            { q: "傳說中「死神的三聖物」分別是指老魔杖、隱形斗篷以及什麼？", a: "魔法石", b: "重生石", c: "預言球", d: "格來分多寶劍", ans: "B", exp: "三聖物是指老魔杖、隱形斗篷與能召喚逝者靈魂幻影的「重生石」。" },
+            { q: "哈利波特一入學就被分配到的「葛來分多」學院，其代表動物與精神是？", a: "獾：溫厚誠實", b: "獅子：勇敢與騎士精神", c: "老鷹：聰明睿智", d: "毒蛇：野心與精明", ans: "B", exp: "葛來分多以「獅子」為院徽，核心精神是勇敢、大膽與豪爽。" },
+            { q: "雷文克勞學院的創辦人「羅威娜·雷文克勞」其王冕上刻著什麼至理名言？", a: "勇往直前即是力量", b: "過人的聰明才智是人類最大的財富", c: "精明與野心使人強大", d: "忠誠與勤奮重於一切", ans: "B", exp: "王冕上刻著：'Wit beyond measure is man's greatest treasure'（過人的聰明才智是人類最大的財富）。" },
+            { q: "霍格華茲廚房裡的無數食物，主要是由哪一種魔法生物負責烹調準備的？", a: "地精", b: "家庭小精靈", c: "人魚", d: "妖精", ans: "B", exp: "霍格華茲廚房內有全英國最龐大的家庭小精靈團隊，默默為全校師生準備一日三餐。" },
+            { q: "妙麗·格蘭傑在四年級時，為了解放飽受奴役的家庭小精靈而成立的組織簡稱是？", a: "D.A.", b: "S.P.E.W. (嘔吐)", c: "W.O.M.B.A.T.", d: "O.W.L.", ans: "B", exp: "妙麗成立了「權益促進會（Society for the Promotion of Elfish Welfare）」，簡稱 SPEW。" },
+            { q: "古靈閣巫師銀行是由哪一種生物全權經營管理的？", a: "人馬", b: "妖精", c: "巨人", d: "吸血鬼", ans: "B", exp: "妖精（Goblin）控制著古靈閣，牠們對金錢、珠寶與魔法契约有著獨特的精明和嚴格。" },
+            { q: "下列哪一種魔法植物的哭聲具有致命的危險，移植時必須戴上耳罩？", a: "惡魔藤", b: "魔蘋果", c: "毒觸手", d: "魚鰓草", ans: "A", exp: "修正：答案為B。成熟「魔蘋果（Mandrake）」的哭聲能讓人當場喪命，幼苗則會讓人昏迷。" },
+            { q: "海格在第一集用火龍蛋孵化出來、後來送往羅馬尼亞的龍叫作什麼名字？", a: "牙牙", b: "諾伯", c: "巴嘴", d: "毛毛", ans: "B", exp: "海格從神秘人手中贏得龍蛋並孵化，命名為「諾伯（Norbert）」，是一隻挪威脊背龍。" },
+            { q: "哈利波特的魔杖與佛地魔的魔杖，其核心都取自同一隻鳳凰的羽毛。那隻鳳凰是誰的寵物？", a: "紐特·斯卡曼德", b: "阿不思·鄧不利多（佛客使）", c: "莉莉·波特", d: "葛林戴華德", ans: "B", exp: "兩根魔杖的核心都來自鄧不利多的專屬鳳凰「佛客使（Fawkes）」，這構成了「孿生核心」的連動。" },
+            { q: "霍格華茲四大學院中，萬應室（Requirements Room）位於城堡的幾樓？", a: "地下室", b: "七樓", c: "三樓", d: "五樓", ans: "B", exp: "萬應室位於巨型掛毯（巨怪棒打巴拿巴）對面的七樓走廊，走過三次便會開啟。" },
+            { q: "榮恩·衛斯理在霍格華茲大戰中，是用什麼方式成功進入密室取得蛇妖毒牙的？", a: "用巨怪的棒子砸開", b: "模仿哈利曾在夢中說過的爬說語", c: "使用萬能開鎖咒", d: "石內卜教授給了他鑰匙", ans: "B", exp: "榮恩展現了驚人的記憶力，模仿哈利對掛墜盒說過的「爬說語」成功開啟了密室之門。" },
+            { q: "九又四分之三月台位於倫敦的哪一個真實火車站內？", a: "希斯洛站", b: "國王十字車站", c: "維多利亞車站", d: "滑鐵盧車站", ans: "C", exp: "修正：答案為B。巫師們需要推著行李穿過「國王十字車站」第九與第十月台之間的第三道磚牆。" },
+            { q: "哈利波特在魁地奇生涯中，第一把屬於自己的飛天掃帚是？", a: "狂風七號", b: "光輪兩千", c: "火閃電", d: "彗星260", ans: "B", exp: "麥教授破格允許哈利參賽，並祕密贈送了他當時最頂尖的飛天掃帚「光輪兩千」。" },
+            { q: "在《死神的聖物》中，馬份莊園的地下室裡，是誰現身使用消影術救出了哈利等人並英勇犧牲？", a: "天狼星·布萊克", b: "多比", c: "怪頭", d: "柯利克", ans: "B", exp: "自由的小精靈多比現身救主，卻不幸在傳送瞬間被貝拉投擲的銀刀刺中，壯烈犧牲。" },
+            { q: "赫夫帕夫學院的幽靈、為人極其和善、總是樂意給學生指路的是誰？", a: "差點沒頭的尼克", b: "胖修士", c: "血腥男爵", d: "灰衣女士", ans: "B", exp: "赫夫帕夫的代表幽靈是「胖修士（Fat Friar）」，他生前也是該學院畢業的開朗巫師。" },
+            { q: "佛地魔復活儀式中，蟲尾奉獻出的「僕人的血肉」，是指他砍斷了自己的哪一個部位？", a: "左腳趾", b: "右手掌", c: "左耳朵", d: "一綹頭髮", ans: "B", exp: "彼得·佩迪魯無情地斬斷了自己的「右手掌」作為復活魔藥中「僕人自願奉獻的血肉」。" },
+            { q: "雷文克勞學院的代表幽靈「灰衣女士」，她生前的真實姓名是什麼？", a: "海倫娜·雷文克勞", b: "巴希達·巴沙特", c: "莉莉·露娜", d: "梅洛普·岡特", ans: "B", exp: "修正：答案為A。她是創辦人羅威娜的女兒海倫娜，因偷走母親王冕被血腥男爵殺害成鬼魂。" },
+            { q: "哈利波特的親生母親莉莉·波特，她生前最擅長、深受史拉轟教授喜愛的是哪一門學科？", a: "符咒學", b: "魔藥學", c: "變形學", d: "占卜學", ans: "C", exp: "修正：答案為B。莉莉在魔藥調配上極具驚人直覺天賦，深得魔藥大師史拉轟的極高讚譽。" },
+            { q: "奈威·隆巴頓在最後決戰中，從分類帽裡拔出了什麼，成功將巨蛇娜吉妮斬首？", a: "老魔杖", b: "葛來分多寶劍", c: "拉文克勞毒牙", d: "隱形斗篷", ans: "B", exp: "只有真正的葛來分多傳人才能在危急時從帽中拔出寶劍，奈威以此一擊致命。" },
+            { q: "哈利波特額頭上的閃電形傷疤，實際上是佛地魔的第幾個分靈體？", a: "第三個", b: "第七個（隱藏分靈體）", c: "第六個", d: "第一個", ans: "B", exp: "當年佛地魔咒語反彈時，靈魂再度分裂，其中碎片無意中依附在哈利身上，使哈利成為第七個非自願分靈體。" },
+            { q: "在《哈利波特》大結局尾聲的「19年後」，哈利與金妮的次子名字是？", a: "詹姆·天狼星·波特", b: "阿不思·賽佛勒斯·波特", c: "莉莉·露娜·波特", d: "弗雷·衛斯理二世", ans: "B", exp: "次子名為阿不思·賽佛勒斯，名字致敬了霍格華茲兩位最偉大、最勇敢的校長。"
         ];
 
         // ==========================================
         // 2. 音效系統 (Web Audio API)
         // ==========================================
         const AudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let globalVolume = 0.5;
+        let globalVolume = 0.4;
         let isMuted = false;
 
-        function playMagicToneSuccess() {
+        function playMagicSuccess() {
             if(isMuted) return;
             const now = AudioCtx.currentTime;
-            createOscillator(523.25, now, 0.15); 
-            createOscillator(659.25, now + 0.08, 0.15); 
-            createOscillator(783.99, now + 0.15, 0.25); 
+            const osc = AudioCtx.createOscillator();
+            const gain = AudioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, now); // C5
+            osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.3); // C6
+            gain.gain.setValueAtTime(globalVolume, now);
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.3);
+            osc.connect(gain); gain.connect(AudioCtx.destination);
+            osc.start(); osc.stop(now + 0.3);
         }
 
-        function playMagicToneFailure() {
+        function playMagicFail() {
             if(isMuted) return;
             const now = AudioCtx.currentTime;
             const osc = AudioCtx.createOscillator();
             const gain = AudioCtx.createGain();
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(180, now);
-            osc.frequency.linearRampToValueAtTime(90, now + 0.4);
-            
-            gain.gain.setValueAtTime(globalVolume * 0.4, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
-            
-            osc.connect(gain);
-            gain.connect(AudioCtx.destination);
-            osc.start(now);
-            osc.stop(now + 0.4);
+            osc.frequency.linearRampToValueAtTime(60, now + 0.4);
+            gain.gain.setValueAtTime(globalVolume * 0.7, now);
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.4);
+            osc.connect(gain); gain.connect(AudioCtx.destination);
+            osc.start(); osc.stop(now + 0.4);
         }
 
-        function playEggMagicSound() {
+        function playSurpriseZap() {
             if(isMuted) return;
             const now = AudioCtx.currentTime;
-            for(let i=0; i<6; i++) {
-                createOscillator(600 + (i * 150), now + (i * 0.05), 0.2);
-            }
-        }
-
-        function createOscillator(freq, startTime, duration) {
             const osc = AudioCtx.createOscillator();
             const gain = AudioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, startTime);
-            gain.gain.setValueAtTime(globalVolume * 0.3, startTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
-            osc.connect(gain);
-            gain.connect(AudioCtx.destination);
-            osc.start(startTime);
-            osc.stop(startTime + duration);
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(300, now);
+            osc.frequency.exponentialRampToValueAtTime(1500, now + 0.5);
+            gain.gain.setValueAtTime(globalVolume * 0.5, now);
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.5);
+            osc.connect(gain); gain.connect(AudioCtx.destination);
+            osc.start(); osc.stop(now + 0.5);
         }
 
         // ==========================================
-        // 3. YouTube 嵌入音樂控制器
+        // 3. YouTube 音樂控制
         // ==========================================
         let ytPlayer = null;
-        
-        const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-        function onYouTubeIframeAPIReady() {
-            ytPlayer = new YT.Player('yt-player-raw', {
-                events: {
-                    'onReady': onPlayerReady
-                }
-            });
-        }
-
-        function onPlayerReady(event) {
-            event.target.setVolume(globalVolume * 100);
-        }
-
         function startMusicPlayback() {
-            if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
-                ytPlayer.playVideo();
-            } else {
-                const iframe = document.getElementById('yt-player-raw');
-                if (iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                }
+            const iframe = document.getElementById('yt-player-raw');
+            if (iframe && iframe.contentWindow) {
+                iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
             }
         }
-
         function changeVolume(value) {
             globalVolume = value / 100;
-            if(ytPlayer && typeof ytPlayer.setVolume === 'function') {
-                ytPlayer.setVolume(value);
-            } else {
-                const iframe = document.getElementById('yt-player-raw');
-                if (iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage(JSON.stringify({"event":"command","func":"setVolume","args":[value]}), '*');
-                }
+            const iframe = document.getElementById('yt-player-raw');
+            if (iframe && iframe.contentWindow) {
+                iframe.contentWindow.postMessage(JSON.stringify({"event":"command","func":"setVolume","args":[value]}), '*');
             }
         }
-
         function toggleMute() {
             isMuted = !isMuted;
             const btn = document.getElementById('mute-toggle-btn');
             const iframe = document.getElementById('yt-player-raw');
-            if(isMuted) {
-                btn.innerText = "❌";
-                if(ytPlayer && typeof ytPlayer.mute === 'function') {
-                    ytPlayer.mute();
-                } else if(iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
-                }
-            } else {
-                btn.innerText = "🔊";
-                if(ytPlayer && typeof ytPlayer.unMute === 'function') {
-                    ytPlayer.unMute();
-                } else if(iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-                }
+            btn.innerText = isMuted ? "❌" : "🔊";
+            if(iframe && iframe.contentWindow) {
+                iframe.contentWindow.postMessage(JSON.stringify({"event":"command","func": isMuted ? "mute" : "unMute","args":""}), '*');
             }
         }
 
         // ==========================================
-        // 4. 遊戲核心邏輯與狀態變數
+        // 4. 核心遊戲邏輯與每 5 題驚喜事件
         // ==========================================
         let currentQuizIndex = 0;
         let userCurrentScore = 0;
         let registeredPlayerName = "無名巫師";
+        let isDoubleScoreActive = false;
 
         function switchView(viewId) {
-            document.querySelectorAll('.game-wrapper').forEach(view => {
-                view.classList.remove('active-view');
-            });
-            const target = document.getElementById(viewId);
-            target.classList.add('active-view');
-            
-            if(AudioCtx.state === 'suspended') {
-                AudioCtx.resume();
-            }
+            document.querySelectorAll('.game-wrapper').forEach(view => view.classList.remove('active-view'));
+            document.getElementById(viewId).classList.add('active-view');
+            if(AudioCtx.state === 'suspended') AudioCtx.resume();
         }
 
         function initiateQuizGame() {
             const inputName = document.getElementById('player-name-input').value.trim();
-            if(!inputName) {
-                alert("請輸入巫師名諱以通過魔法部屏障！");
-                return;
-            }
+            if(!inputName) { alert("請填入巫師名字以登錄羊皮紙！"); return; }
             registeredPlayerName = inputName;
-            
-            if(AudioCtx.state === 'suspended') {
-                AudioCtx.resume();
-            }
             startMusicPlayback();
-            
             currentQuizIndex = 0;
             userCurrentScore = 0;
-            
+            isDoubleScoreActive = false;
             renderQuestionStructure();
             switchView('view-quiz');
         }
 
         function getLevelTierLabel(index) {
-            const num = index + 1; 
-            if(num <= 10) return "🔥 夯";
-            if(num <= 20) return "👑 頂級";
-            if(num <= 30) return "💪 人上人";
-            if(num <= 40) return "🤖 NPC";
-            return "🗑️ 拉";
+            const num = index + 1;
+            if(num <= 10) return "🧙‍♂️ 一年級生";
+            if(num <= 20) return "🧪 二年級生";
+            if(num <= 30) return "🧹 三年級生";
+            if(num <= 40) return "📜 級長";
+            return "🦅 男生主席";
         }
 
         function renderQuestionStructure() {
+            // 每5題觸發一次驚喜 (第5, 10, 15, 20... 題)
+            if (currentQuizIndex > 0 && currentQuizIndex % 5 === 0) {
+                triggerSurpriseEvent((currentQuizIndex / 5) % 5);
+                return; 
+            }
+            actualRenderQuestion();
+        }
+
+        function actualRenderQuestion() {
             const quizItem = quizDatabase[currentQuizIndex];
-            
             document.getElementById('hud-level-badge').innerText = getLevelTierLabel(currentQuizIndex);
             document.getElementById('hud-score-counter').innerText = userCurrentScore;
             document.getElementById('hud-index-counter').innerText = currentQuizIndex + 1;
             
             const percent = ((currentQuizIndex + 1) / 50) * 100;
             document.getElementById('quiz-progress-inner').style.width = percent + "%";
-
             document.getElementById('question-box').innerText = `【${currentQuizIndex + 1}】${quizItem.q}`;
             
-            // 第 5 題（索引為 4）顯示消去法按鈕
-            const eggBtn = document.getElementById('reparo-egg-btn');
-            if (currentQuizIndex === 4) {
-                eggBtn.style.display = 'block';
-            } else {
-                eggBtn.style.display = 'none';
-            }
-
             const optBox = document.getElementById('options-box');
             optBox.innerHTML = '';
             
@@ -910,39 +539,9 @@
             document.getElementById('feedback-box').style.display = 'none';
         }
 
-        // 第 5 題限定「復復修」消去法
-        function triggerReparoMagic() {
-            const currentQuestion = quizDatabase[currentQuizIndex];
-            const allOptionElements = document.querySelectorAll('.option-item');
-            const eggBtn = document.getElementById('reparo-egg-btn');
-            
-            let wrongElements = [];
-            allOptionElements.forEach(el => {
-                const key = el.getAttribute('data-key');
-                if (key !== currentQuestion.ans) {
-                    wrongElements.push(el);
-                }
-            });
-
-            wrongElements.sort(() => Math.random() - 0.5);
-            
-            if (wrongElements[0]) wrongElements[0].classList.add('erased');
-            if (wrongElements[1]) wrongElements[1].classList.add('erased');
-
-            playEggMagicSound();
-            const flashOverlay = document.getElementById('flash-overlay');
-            flashOverlay.style.background = "rgba(255, 215, 0, 0.3)";
-            flashOverlay.style.opacity = "1";
-            setTimeout(() => { flashOverlay.style.opacity = "0"; }, 300);
-
-            eggBtn.style.display = 'none';
-        }
-
         function evaluateUserAnswer(chosenKey, elementToken) {
             const currentQuestion = quizDatabase[currentQuizIndex];
             const allOptionElements = document.querySelectorAll('.option-item');
-            
-            document.getElementById('reparo-egg-btn').style.display = 'none';
             allOptionElements.forEach(el => el.classList.add('disabled'));
 
             const feedbackAlert = document.getElementById('feedback-alert');
@@ -950,38 +549,37 @@
             const quizCard = document.getElementById('view-quiz');
 
             if(chosenKey === currentQuestion.ans) {
-                userCurrentScore++;
+                let pointsGained = isDoubleScoreActive ? 2 : 1;
+                userCurrentScore += pointsGained;
                 elementToken.classList.add('correct');
-                feedbackAlert.innerText = "✓ 正確！魔法力量與你同在！";
+                feedbackAlert.innerText = isDoubleScoreActive ? "✨ 福靈劑爆發！雙倍增益：+2 學院積分！" : "✨ 完美的咒語！成功獲得積分！";
                 feedbackAlert.className = "feedback-status is-correct";
-                playMagicToneSuccess();
+                playMagicSuccess();
 
-                flashOverlay.style.background = "rgba(46, 204, 113, 0.4)";
+                flashOverlay.style.background = "rgba(46, 204, 113, 0.3)";
                 flashOverlay.style.opacity = "1";
-                setTimeout(() => { flashOverlay.style.opacity = "0"; }, 200);
-
+                setTimeout(() => flashOverlay.style.opacity = "0", 200);
             } else {
                 elementToken.classList.add('wrong');
-                feedbackAlert.innerText = "✗ 答錯！魔杖似乎揮錯了方向...";
+                feedbackAlert.innerText = "❌ 咒語反彈！不幸痛失分數...";
                 feedbackAlert.className = "feedback-status is-wrong";
-                playMagicToneFailure();
+                playMagicFail();
 
                 allOptionElements.forEach(el => {
-                    if(el.getAttribute('data-key') === currentQuestion.ans) {
-                        el.classList.add('correct');
-                    }
+                    if(el.getAttribute('data-key') === currentQuestion.ans) el.classList.add('correct');
                 });
 
-                flashOverlay.style.background = "rgba(231, 76, 60, 0.4)";
+                flashOverlay.style.background = "rgba(231, 76, 60, 0.3)";
                 flashOverlay.style.opacity = "1";
-                setTimeout(() => { flashOverlay.style.opacity = "0"; }, 200);
+                setTimeout(() => flashOverlay.style.opacity = "0", 200);
                 
                 quizCard.classList.add('shake-effect');
-                setTimeout(() => { quizCard.classList.remove('shake-effect'); }, 400);
+                setTimeout(() => quizCard.classList.remove('shake-effect'), 400);
             }
 
+            isDoubleScoreActive = false; // 重設福靈劑狀態
             document.getElementById('hud-score-counter').innerText = userCurrentScore;
-            document.getElementById('explanation-box').innerText = `正確答案：【${currentQuestion.ans}】。${currentQuestion.exp}`;
+            document.getElementById('explanation-box').innerText = `正確答案為【${currentQuestion.ans}】。${currentQuestion.exp}`;
             document.getElementById('feedback-box').style.display = 'block';
         }
 
@@ -994,51 +592,178 @@
             }
         }
 
+        // ==========================================
+        // 5. 驚喜事件核心調度中心
+        // ==========================================
+        function triggerSurpriseEvent(typeCode) {
+            playSurpriseZap();
+            const screen = document.getElementById('surprise-screen');
+            const container = document.getElementById('surprise-dynamic-content');
+            container.innerHTML = '';
+            screen.classList.add('show');
+
+            // 根據不同關卡觸發 5 種不同驚喜機制
+            if (typeCode === 1) {
+                // 驚喜 1: 霍格華茲開學信狂飛 (玩家必須點擊打開信件才能解鎖下一題)
+                container.innerHTML = `
+                    <div class="surprise-title">🦉 貓頭鷹送信狂潮！！</div>
+                    <div class="surprise-desc">成百上千封霍格華茲入學通知信正從壁爐和窗戶瘋狂飛入！快在混亂中點擊並打開其中一封信，才能重回測驗！</div>
+                `;
+                spawnFlyingLetters(screen);
+            } 
+            else if (typeCode === 2) {
+                // 驚喜 2: 消失咒 (直接幫玩家移除兩個錯誤答案，降低難度)
+                container.innerHTML = `
+                    <div class="surprise-title">🪄 施展「消去咒 (Evanesco)」</div>
+                    <div class="surprise-desc">你的魔杖發出耀眼光芒！強大的消失咒已成功抹除本題的其中兩個錯誤答案！</div>
+                    <button class="magic-btn" onclick="applyVanishSurprise()">收下魔咒利多</button>
+                `;
+            }
+            else if (typeCode === 3) {
+                // 驚喜 3: 時光器倒轉 (立刻額外獲得 1 分)
+                container.innerHTML = `
+                    <div class="surprise-title">⏳ 時光器倒轉沙漏</div>
+                    <div class="surprise-desc">妙麗悄悄撥動了時光器！時間逆流回上一秒，你從未來的時空中為自己的學院額外偷渡到了 +1 積分！</div>
+                    <button class="magic-btn" onclick="applyTimeTurnerSurprise()">啟動時間魔法</button>
+                `;
+            }
+            else if (typeCode === 4) {
+                // 驚喜 4: 咆哮信轟炸 (快答挑戰，必須立刻點擊，否則會炸掉)
+                container.innerHTML = `
+                    <div class="surprise-title">💌 茉莉衛斯理的咆哮信！</div>
+                    <div class="surprise-desc" style="color:#e74c3c; font-weight:bold;">「你竟敢偷開飛天汽車！！」咆哮信即將紅透爆炸！快在 5 秒內猛擊拆開牠，否則會震碎你的耳膜！</div>
+                    <button class="magic-btn" style="background:#c0392b;" onclick="dismissHowler()">💥 立刻撕碎咆哮信</button>
+                `;
+            }
+            else {
+                // 驚喜 5: 福靈劑 (下一題答對得2分)
+                container.innerHTML = `
+                    <div class="surprise-title">🧪 幸運的「福靈劑 (Felix Felicis)」</div>
+                    <div class="surprise-desc">你成功偷喝了一小口金色魔藥。下一題你將獲得無上好運，若答對將觸發【雙倍積分增益】！</div>
+                    <button class="magic-btn" onclick="applyLiquidLuckSurprise()">一飲而盡</button>
+                `;
+            }
+        }
+
+        // 驚喜 1: 飛行的開學信
+        function spawnFlyingLetters(parentOverlay) {
+            const letterCount = 15;
+            const lettersCreated = [];
+
+            for (let i = 0; i < letterCount; i++) {
+                const letter = document.createElement('div');
+                letter.className = 'letter-particle';
+                letter.style.top = Math.random() * 80 + 10 + '%';
+                letter.style.left = Math.random() * 80 + 5 + '%';
+                letter.style.transform = `scale(${Math.random() * 0.4 + 0.8}) rotate(${Math.random() * 40 - 20}deg)`;
+                
+                letter.onclick = (e) => {
+                    e.stopPropagation();
+                    playMagicSuccess();
+                    
+                    // 顯示開箱內容
+                    letter.style.display = 'none';
+                    const container = document.getElementById('surprise-dynamic-content');
+                    container.innerHTML = `
+                        <div class="letter-popup-content" style="display:block;">
+                            <h3 style="color:#5c1d1d; margin-bottom:15px; font-family:serif;">霍格華茲魔法學校</h3>
+                            <p style="color:#222; font-size:0.95rem; line-height:1.6; text-align:left;">
+                                親愛的巫師：<br>
+                                我們很高興通知您，您已獲准在霍格華茲魔法學校就讀。隨信附上所需書籍及裝備名單。<br>
+                                學期定於九月一日開始。<br><br>
+                                副校長 米奈娃·麥 謹上
+                            </p>
+                            <button class="magic-btn" style="margin-top:20px; background:#5c1d1d; width:100%;" onclick="closeSurpriseOverlay()">戴上巫師帽前進</button>
+                        </div>
+                    `;
+                    // 清理其他信件
+                    lettersCreated.forEach(l => l.remove());
+                };
+
+                parentOverlay.appendChild(letter);
+                lettersCreated.push(letter);
+            }
+        }
+
+        // 關閉驚喜層並重繪題目
+        function closeSurpriseOverlay() {
+            document.getElementById('surprise-screen').classList.remove('show');
+            actualRenderQuestion();
+        }
+
+        // 驚喜 2 處理
+        function applyVanishSurprise() {
+            document.getElementById('surprise-screen').classList.remove('show');
+            actualRenderQuestion();
+            
+            // 延遲一下執行消去
+            setTimeout(() => {
+                const quizItem = quizDatabase[currentQuizIndex];
+                const options = document.querySelectorAll('.option-item');
+                let count = 0;
+                options.forEach(opt => {
+                    const key = opt.getAttribute('data-key');
+                    if (key !== quizItem.ans && count < 2) {
+                        opt.classList.add('vanished');
+                        count++;
+                    }
+                });
+            }, 300);
+        }
+
+        // 驚喜 3 處理
+        function applyTimeTurnerSurprise() {
+            userCurrentScore += 1;
+            closeSurpriseOverlay();
+        }
+
+        // 驚喜 4 處理
+        function dismissHowler() {
+            closeSurpriseOverlay();
+        }
+
+        // 驚喜 5 處理
+        function applyLiquidLuckSurprise() {
+            isDoubleScoreActive = true;
+            closeSurpriseOverlay();
+        }
+
+        // ==========================================
+        // 6. 結算與排行榜儲存
+        // ==========================================
         function concludeQuizSession() {
             document.getElementById('final-score-num').innerText = userCurrentScore;
-            
-            let titleRank = "";
-            if(userCurrentScore >= 45) titleRank = "🏆 霍格華茲傳奇";
-            else if(userCurrentScore >= 35) titleRank = "⚡ 魁地奇明星";
-            else if(userCurrentScore >= 25) titleRank = "📚 資深巫師";
-            else if(userCurrentScore >= 15) titleRank = "🪄 魔法學徒";
-            else titleRank = "🐀 爆角怪飼養員";
+            let rankName = "";
+            if(userCurrentScore >= 45) rankName = "🧙‍♂️ 梅林勳章一級大法師";
+            else if(userCurrentScore >= 35) rankName = "🦅 鳳凰會核心核心幹部";
+            else if(userCurrentScore >= 25) rankName = "🦁 葛來分多優秀級長";
+            else if(userCurrentScore >= 15) rankName = "🧹 魔法部底層實習生";
+            else rankName = "🦉 爆竹 (完全不會魔法)";
 
-            document.getElementById('final-rank-badge').innerText = `評定稱號：${titleRank}`;
+            document.getElementById('final-rank-badge').innerText = `榮獲稱號：${rankName}`;
             commitScoreToStorage(registeredPlayerName, userCurrentScore);
             switchView('view-result');
         }
 
-        // ==========================================
-        // 5. 排行榜 LocalStorage 控制
-        // ==========================================
         function commitScoreToStorage(name, score) {
-            let records = JSON.parse(localStorage.getItem('hogwarts_ranks')) || [];
+            let records = JSON.parse(localStorage.getItem('hp_magic_ranks')) || [];
             const timestamp = new Date().toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' });
-            
             records.push({ name: name, score: score, date: timestamp });
             records.sort((a, b) => b.score - a.score);
-            
             if(records.length > 10) records = records.slice(0, 10);
-            localStorage.setItem('hogwarts_ranks', JSON.stringify(records));
+            localStorage.setItem('hp_magic_ranks', JSON.stringify(records));
         }
 
         function showRankingsView() {
-            const records = JSON.parse(localStorage.getItem('hogwarts_ranks')) || [];
+            const records = JSON.parse(localStorage.getItem('hp_magic_ranks')) || [];
             const tbody = document.getElementById('rank-table-body');
             tbody.innerHTML = '';
-
             if(records.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#7f8c8d;">名人堂尚無巫師足跡</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#555;">石碑上尚未刻下任何先驅名字</td></tr>`;
             } else {
                 records.forEach((row, idx) => {
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${idx + 1}</td>
-                        <td>${escapeHtml(row.name)}</td>
-                        <td>${row.score} 分</td>
-                        <td>${row.date}</td>
-                    `;
+                    tr.innerHTML = `<td>${idx + 1}</td><td>${escapeHtml(row.name)}</td><td>${row.score}</td><td>${row.date}</td>`;
                     tbody.appendChild(tr);
                 });
             }
@@ -1046,20 +771,20 @@
         }
 
         function clearRankings() {
-            if(confirm("你確定要使用消消樂法術，清除所有名人堂排行榜紀錄嗎？")) {
-                localStorage.removeItem('hogwarts_ranks');
-                alert("排行榜已歸於塵土。");
+            if(confirm("確定要抹去魔法石碑上的所有巫師紀錄嗎？")) {
+                localStorage.removeItem('hp_magic_ranks');
+                alert("記憶已消除（阿哇呾喀呾啦！）。");
             }
         }
 
         function escapeHtml(str) {
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
         // ==========================================
-        // 6. 全螢幕魔法粒子特效動畫
+        // 7. 螢光魔法光點粒子背景
         // ==========================================
-        const canvas = document.getElementById('particles');
+        const canvas = document.getElementById('magic-particles');
         const ctx = canvas.getContext('2d');
         let particleArray = [];
 
@@ -1070,20 +795,21 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        class MagicParticle {
+        class MagicSparkle {
             constructor() {
                 this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height + canvas.height;
-                this.size = Math.random() * 2.5 + 0.5;
-                this.speedY = Math.random() * -1.2 - 0.3;
-                this.speedX = Math.random() * 0.6 - 0.3;
-                this.alpha = Math.random() * 0.5 + 0.4;
+                this.y = Math.random() * canvas.height;
+                this.radius = Math.random() * 3 + 1;
+                this.speedY = Math.random() * -0.6 - 0.2;
+                this.speedX = Math.random() * 0.4 - 0.2;
+                this.alpha = Math.random() * 0.5 + 0.2;
+                this.color = Math.random() > 0.5 ? '#d4af37' : '#7fdbff';
             }
             update() {
                 this.y += this.speedY;
                 this.x += this.speedX;
-                if (this.y < 0) {
-                    this.y = canvas.height;
+                if (this.y < -10) {
+                    this.y = canvas.height + 10;
                     this.x = Math.random() * canvas.width;
                 }
             }
@@ -1091,10 +817,10 @@
                 ctx.save();
                 ctx.globalAlpha = this.alpha;
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = '#ffd700';
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
                 ctx.shadowBlur = 8;
-                ctx.shadowColor = '#ffd700';
+                ctx.shadowColor = this.color;
                 ctx.fill();
                 ctx.restore();
             }
@@ -1102,18 +828,12 @@
 
         function initParticles() {
             particleArray = [];
-            const count = Math.min(Math.floor(canvas.width / 15), 80);
-            for(let i=0; i<count; i++) {
-                particleArray.push(new MagicParticle());
-            }
+            for(let i=0; i<40; i++) { particleArray.push(new MagicSparkle()); }
         }
 
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particleArray.forEach(p => {
-                p.update();
-                p.draw();
-            });
+            particleArray.forEach(p => { p.update(); p.draw(); });
             requestAnimationFrame(animateParticles);
         }
 
