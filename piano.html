@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>極致奢華・黑金電競惡搞鋼琴模擬器 Pro Max</title>
+    <style>
+        /* --- 基礎奢華黑金風格設定 --- */
+        :root {
+            --gold: #dfb76c;
+            --gold-light: #f5e0b3;
+            --gold-dark: #8a6f27;
+            --dark-bg: #0a0a0a;
+            --panel-bg: rgba(20, 20, 20, 0.6);
+            --neon-glow: 0 0 15px rgba(223, 183, 108, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #fff;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px; /* 3D 景深 */
+        }
+
+        /* --- 背景動態粒子與環境效果 --- */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* --- RGB 跑馬燈外框與玻璃擬態面板 --- */
+        .main-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+            background: var(--panel-bg);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), var(--neon-glow);
+            transform: rotateX(10deg); /* 3D 傾斜 */
+            transition: transform 0.3s ease, filter 0.3s ease;
+            max-width: 95vw;
+        }
+
+        /* RGB 跑馬燈流光邊框效果 */
+        .main-container::before {
+            content: '';
+            position: absolute;
+            top: -3px; left: -3px; right: -3px; bottom: -3px;
+            background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+            background-size: 400%;
+            z-index: -1;
+            border-radius: 27px;
+            opacity: 0.4;
+            animation: rgb-glow 20s linear infinite;
+        }
+
+        @keyframes rgb-glow {
+            0% { background-position: 0 0; }
+            50% { background-position: 400% 0; }
+            100% { background-position: 0 0; }
+        }
+
+        /* --- 標題與控制區 --- */
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #fff 30%, var(--gold) 70%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(223,183,108,0.3);
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 25px;
+            letter-spacing: 2px;
+        }
+
+        /* --- 惡搞按鈕 --- */
+        .troll-btn {
+            position: relative;
+            padding: 12px 35px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #000;
+            background: linear-gradient(45deg, var(--gold), #fff, var(--gold-dark));
+            background-size: 200% auto;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(223,183,108,0.6);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            animation: pulse 2s infinite;
+        }
+
+        .troll-btn:hover {
+            transform: scale(1.08) translateY(-3px);
+            box-shadow: 0 0 30px rgba(255,215,0,0.9);
+            background-position: right center;
+        }
+
+        .troll-btn:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 15px rgba(223,183,108,0.5); }
+            50% { box-shadow: 0 0 30px rgba(223,183,108,0.9); }
+            100% { box-shadow: 0 0 15px rgba(223,183,108,0.5); }
+        }
+
+        /* --- 鋼琴鍵盤本體 --- */
+        .keyboard {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            border: 1px solid rgba(223, 183, 108, 0.2);
+            position: relative;
+        }
+
+        /* 白鍵精緻設計 */
+        .key {
+            position: relative;
+            width: 70px;
+            height: 240px;
+            background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
+            border-radius: 0 0 8px 8px;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #b0b0b0, 0 15px 20px rgba(0,0,0,0.5);
+            transform-origin: top;
+            transition: background 0.1s, transform 0.1s, box-shadow 0.1s;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 15px;
+            color: #333;
+            font-weight: bold;
+            font-size: 1.2rem;
+            z-index: 2;
+        }
+
+        /* 鍵盤提示字 */
+        .key::after {
+            content: attr(data-hint);
+            position: absolute;
+            top: 15px;
+            font-size: 0.8rem;
+            color: #aaa;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 2px 6px;
+            background: rgba(255,255,255,0.8);
+        }
+
+        /* 按下時的 3D 下壓與發光效果 */
+        .key.active {
+            background: linear-gradient(to bottom, #fff 0%, var(--gold-light) 100%);
+            transform: rotateX(-8deg) scaleY(0.97);
+            box-shadow: 0 2px 0 var(--gold-dark), 0 4px 10px rgba(223,183,108,0.6);
+            color: var(--gold-dark);
+            text-shadow: 0 0 8px rgba(223,183,108,0.5);
+        }
+
+        /* --- 惡搞事件引發的特殊樣式 --- */
+        /* 事件4：彩虹閃爍 */
+        .rainbow-mode .key {
+            animation: rainbow-flash 0.5s linear infinite alternate;
+        }
+        @keyframes rainbow-flash {
+            0% { background: #ff0000; color: #fff; }
+            25% { background: #00ff00; color: #000; }
+            50% { background: #0000ff; color: #fff; }
+            75% { background: #ffff00; color: #000; }
+            100% { background: #ff00ff; color: #fff; }
+        }
+
+        /* 畫面震動 Class */
+        .shake {
+            animation: heavy-shake 0.15s linear infinite;
+        }
+        @keyframes heavy-shake {
+            0% { transform: translate(2px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(0px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(2px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(2px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        /* --- 各種浮誇滿版覆蓋提示 --- */
+        .overlay-text {
+            position: absolute;
+            font-weight: 900;
+            text-align: center;
+            pointer-events: none;
+            z-index: 100;
+            display: none;
+        }
+
+        #grandma-text {
+            font-size: 5rem;
+            color: #ff3333;
+            text-shadow: 0 0 20px #000, 0 0 40px #ff0000;
+            transform: scale(0);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #question-text {
+            font-size: 12rem;
+            color: #fff;
+            text-shadow: 0 0 30px #ff00ff, 0 0 60px #00ffff;
+        }
+
+        /* 鋼琴.exe 假當機視窗 */
+        #crash-window {
+            position: absolute;
+            width: 350px;
+            background: #f0f0f0;
+            border: 1px solid #005a9e;
+            color: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 200;
+            border-radius: 3px;
+            padding: 2px;
+        }
+        .crash-title {
+            background: linear-gradient(90deg, #005a9e, #429ce3);
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+        .crash-body {
+            padding: 20px;
+            font-size: 13px;
+        }
+        .crash-btn {
+            float: right;
+            margin-top: 15px;
+            padding: 4px 20px;
+            background: #e1e1e1;
+            border: 1px solid #adadad;
+            cursor: pointer;
+        }
+        .crash-btn:hover { background: #e5f1fb; border-color: #0078d7; }
+
+        /* --- 2D 特效粒子底層樣式 --- */
+        .wave-effect {
+            position: absolute;
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            animation: wave-expand 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            z-index: 5;
+        }
+        @keyframes wave-expand {
+            0% { width: 0; height: 0; opacity: 1; }
+            10% { border-color: #fff; }
+            100% { width: 250px; height: 250px; opacity: 0; border-color: var(--gold-dark); }
+        }
+
+        /* RWD 響應式調整 */
+        @media (max-width: 600px) {
+            .key { width: 45px; height: 180px; font-size: 1rem; }
+            h1 { font-size: 1.3rem; }
+            .troll-btn { padding: 8px 20px; font-size: 0.9rem; }
+            #grandma-text { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="main-container" id="main-container">
+        <h1>Grand Piano Simulator</h1>
+        <div class="subtitle">PREMIUM GOLD EDITION • PRO MAX</div>
+
+        <button class="troll-btn" id="troll-btn" onclick="triggerTrollEvent()">開啟神秘惡搞模式 ☠️</button>
+
+        <div class="keyboard" id="keyboard">
+            <div class="key" data-note="261.63" data-name="Do" data-hint="A">Do</div>
+            <div class="key" data-note="293.66" data-name="Re" data-hint="S">Re</div>
+            <div class="key" data-note="329.63" data-name="Mi" data-hint="D">Mi</div>
+            <div class="key" data-note="349.23" data-name="Fa" data-hint="F">Fa</div>
+            <div class="key" data-note="392.00" data-name="Sol" data-hint="G">Sol</div>
+            <div class="key" data-note="440.00" data-name="La" data-hint="H">La</div>
+            <div class="key" data-note="493.88" data-name="Si" data-hint="J">Si</div>
+        </div>
+    </div>
+
+    <div class="overlay-text" id="grandma-text">你彈得比我阿嬤還爛 👵🔥</div>
+    <div class="overlay-text" id="question-text">？？？？？？❓</div>
+
+    <div id="crash-window">
+        <div class="crash-title"><span>鋼琴.exe - 應用程式錯誤</span><span>✕</span></div>
+        <div class="crash-body">
+            應用程式發生例外狀況 不明的軟體例外錯誤 (0xc0000409)，位置於 0x0040f6c2。<br><br>
+            <b>鋼琴.exe 已停止運作。</b>
+            <button class="crash-btn" onclick="closeCrash()">確定</button>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================
+         * 1. 全域變數、音訊初始化與設定
+         * ========================================== */
+        const keys = document.querySelectorAll('.key');
+        const container = document.getElementById('main-container');
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // 惡搞狀態旗標
+        let currentTrollMode = 0; 
+        let forceSingleNote = false; // 事件9：強迫同一個音
+
+        // 粒子陣列
+        let particles = [];
+        let fallingEmojis = [];
+
+        /* ==========================================
+         * 2. 核心音效合成器 (Web Audio API)
+         * ========================================== */
+        
+        // 【音效 A：模擬真實鋼琴聲】
+        function playPianoSound(frequency) {
+            if (!audioCtx) return;
+            
+            const destination = audioCtx.destination;
+            const masterGain = audioCtx.createGain();
+            masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+            masterGain.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.02); 
+            masterGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.8); 
+            masterGain.connect(destination);
+
+            const harmonics = [1, 2, 3, 4, 5];
+            const gains = [0.5, 0.25, 0.15, 0.07, 0.03];
+
+            harmonics.forEach((h, i) => {
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(frequency * h, audioCtx.currentTime);
+                
+                if (i > 0) osc.frequency.setValueAtTime(frequency * h + (Math.random() * 2 - 1), audioCtx.currentTime);
+
+                g.gain.setValueAtTime(gains[i], audioCtx.currentTime);
+                
+                osc.connect(g);
+                g.connect(masterGain);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 1.8);
+            });
+        }
+
+        // 【音效 B：魔性雞叫聲合成器】
+        function playChickenSound(baseFreq) {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(baseFreq * 1.5, now);
+            osc.frequency.exponentialRampToValueAtTime(baseFreq * 3.5, now + 0.08);
+            osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.8, now + 0.3);
+
+            gainNode.gain.setValueAtTime(0.4, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(2000, now);
+
+            osc.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            osc.start(now);
+            osc.stop(now + 0.35);
+        }
+
+        // 【音效 C：搞笑音效 (事件6)】
+        function playFunnySound() {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(1200, now + 0.6);
+
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.6);
+        }
+
+        /* ==========================================
+         * 3. 鍵盤互動、特效與觸發邏輯
+         * ========================================== */
+
+        function pressKey(keyElement) {
+            if (!keyElement) return;
+            initAudio();
+
+            keyElement.classList.add('active');
+            setTimeout(() => keyElement.classList.remove('active'), 150);
+
+            let freq = parseFloat(keyElement.getAttribute('data-note'));
+
+            if (forceSingleNote) {
+                freq = 130.81; 
+            }
+
+            if (currentTrollMode === 1) {
+                playChickenSound(freq);
+            } else {
+                playPianoSound(freq);
+            }
+
+            createKeyRipple(keyElement);
+            generateKeyParticles(keyElement);
+        }
+
+        function createKeyRipple(keyElement) {
+            const rect = keyElement.getBoundingClientRect();
+            const ripple = document.createElement('div');
+            ripple.classList.add('wave-effect');
+            
+            ripple.style.left = `${rect.left + rect.width / 2}px`;
+            ripple.style.top = `${rect.top + rect.height * 0.8}px`;
+            
+            document.body.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        /* ==========================================
+         * 4. 2D Canvas 粒子渲染系統 (60FPS)
+         * ========================================== */
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class StandardParticle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 0.4 - 0.2;
+                this.speedY = Math.random() * -0.5 - 0.1;
+                this.alpha = Math.random() * 0.5 + 0.2;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.y < 0) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = `rgba(223, 183, 108, ${this.alpha})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        class KeyBurstParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 4 + 2;
+                this.speedX = Math.random() * 6 - 3;
+                this.speedY = Math.random() * -8 - 2;
+                this.gravity = 0.3;
+                this.alpha = 1;
+                this.color = Math.random() > 0.3 ? '#dfb76c' : '#ffffff';
+            }
+            update() {
+                this.speedY += this.gravity;
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.alpha -= 0.02;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < 60; i++) {
+            particles.push(new StandardParticle());
+        }
+
+        function generateKeyParticles(keyElement) {
+            const rect = keyElement.getBoundingClientRect();
+            const startX = rect.left + rect.width / 2;
+            const startY = rect.bottom;
+            for (let i = 0; i < 15; i++) {
+                particles.push(new KeyBurstParticle(startX, startY));
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            for (let i = fallingEmojis.length - 1; i >= 0; i--) {
+                const item = fallingEmojis[i];
+                item.y += item.speed;
+                item.angle += item.spin;
+                
+                ctx.save();
+                ctx.translate(item.x, item.y);
+                ctx.rotate(item.angle);
+                ctx.font = `${item.size}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(item.char, 0, 0);
+                ctx.restore();
+
+                if (item.y > canvas.height + 50) {
+                    fallingEmojis.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+
+        /* ==========================================
+         * 5. 瘋狂惡搞模式事件集 (10大隨機事件)
+         * ========================================== */
+        function triggerTrollEvent() {
+            const eventId = Math.floor(Math.random() * 10) + 1;
+            cleanUpTrollEffects(); 
+
+            const btn = document.getElementById('troll-btn');
+            btn.innerText = `🚨 當前惡搞事件：N0.${eventId} 🚨`;
+
+            switch(eventId) {
+                case 1:
+                    currentTrollMode = 1;
+                    break;
+
+                case 2:
+                    const gText = document.getElementById('grandma-text');
+                    gText.style.display = 'block';
+                    setTimeout(() => gText.style.transform = 'scale(1)', 50);
+                    setTimeout(() => {
+                        gText.style.transform = 'scale(0)';
+                        setTimeout(() => gText.style.display = 'none', 500);
+                    }, 3000);
+                    break;
+
+                case 3:
+                    keys.forEach(k => {
+                        const ranX = Math.random() * 160 - 80;
+                        const ranY = Math.random() * 100 - 50;
+                        const ranRot = Math.random() * 90 - 45;
+                        k.style.transform = `translate(${ranX}px, ${ranY}px) rotate(${ranRot}deg)`;
+                    });
+                    break;
+
+                case 4:
+                    document.getElementById('keyboard').classList.add('rainbow-mode');
+                    break;
+
+                case 5:
+                    const qText = document.getElementById('question-text');
+                    qText.style.display = 'block';
+                    document.body.classList.add('shake');
+                    setTimeout(() => {
+                        qText.style.display = 'none';
+                        document.body.classList.remove('shake');
+                    }, 2500);
+                    break;
+
+                case 6:
+                    playFunnySound();
+                    break;
+
+                case 7:
+                    const orders = [1, 2, 3, 4, 5, 6, 7].sort(() => Math.random() - 0.5);
+                    keys.forEach((k, idx) => {
+                        k.style.order = orders[idx];
+                    });
+                    break;
+
+                case 8:
+                    const emojis = ['😂', '🤣', '💀', '🗿'];
+                    for(let i=0; i<40; i++) {
+                        fallingEmojis.push({
+                            x: Math.random() * canvas.width,
+                            y: -50 - (Math.random() * 500),
+                            char: emojis[Math.floor(Math.random() * emojis.length)],
+                            size: Math.random() * 30 + 20,
+                            speed: Math.random() * 5 + 3,
+                            spin: Math.random() * 0.1 - 0.05,
+                            angle: Math.random() * Math.PI
+                        });
+                    }
+                    break;
+
+                case 9:
+                    forceSingleNote = true;
+                    break;
+
+                case 10:
+                    const crashWin = document.getElementById('crash-window');
+                    crashWin.style.left = `${Math.random() * (window.innerWidth - 350)}px`;
+                    crashWin.style.top = `${Math.random() * (window.innerHeight - 200)}px`;
+                    crashWin.style.display = 'block';
+                    break;
+            }
+        }
+
+        function cleanUpTrollEffects() {
+            currentTrollMode = 0;
+            forceSingleNote = false;
+            document.getElementById('keyboard').classList.remove('rainbow-mode');
+            keys.forEach(k => {
+                k.style.transform = 'none';
+                k.style.order = 'unset';
+            });
+        }
+
+        function closeCrash() {
+            document.getElementById('crash-window').style.display = 'none';
+        }
+
+        /* ==========================================
+         * 6. 事件監聽 (滑鼠點擊與電腦鍵盤)
+         * ========================================== */
+        keys.forEach(key => {
+            key.addEventListener('mousedown', () => pressKey(key));
+            key.addEventListener('touchstart', (e) => {
+                e.preventDefault(); 
+                pressKey(key);
+            });
+        });
+
+        const keyMap = {
+            'a': 0, 'A': 0,
+            's': 1, 'S': 1,
+            'd': 2, 'D': 2,
+            'f': 3, 'F': 3,
+            'g': 4, 'G': 4,
+            'h': 5, 'H': 5,
+            'j': 6, 'J': 6
+        };
+
+        window.addEventListener('keydown', (e) => {
+            if (e.repeat) return;
+            if (keyMap[e.key] !== undefined) {
+                const index = keyMap[e.key];
+                pressKey(keys[index]);
+            }
+        });
+    </script>
+</body>
+</html>
