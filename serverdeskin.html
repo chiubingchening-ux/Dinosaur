@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AeroFree Panel - 2026 跨端頂級託管平台</title>
+    <style>
+        :root {
+            --font-main: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: "JetBrains Mono", "Fira Code", monospace;
+            --bg-darkest: #0a0d14;
+            --bg-sidebar: #101420;
+            --bg-card: #171d2c;
+            --bg-input: #0a0d14;
+            --border-gray: #242c3f;
+            --text-main: #cbd5e1;
+            --text-muted: #64748b;
+            
+            --status-green: #10b981;
+            --status-cyan: #06b6d4;
+            --status-orange: #f97316;
+            --status-red: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); user-select: none; }
+        body { background-color: var(--bg-darkest); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
+        
+        .flex { display: flex; }
+        .align-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .hidden { display: none !important; }
+
+        /* ================= 開場動畫 & 登入頁 ================= */
+        #loading-screen { position: fixed; top:0; left:0; width:100vw; height:100vh; background:#05070c; z-index:100000; display:flex; flex-direction:column; justify-content:center; align-items:center; transition: opacity 0.6s ease; }
+        .logo-glow { font-size: 36px; font-weight: 900; color: #fff; letter-spacing: 3px; text-shadow: 0 0 20px rgba(6, 182, 212, 0.6); text-align: center; }
+        .logo-glow span { color: var(--status-cyan); }
+        .load-bar { width: 200px; height: 3px; background: #111827; border-radius: 4px; margin-top: 24px; overflow: hidden; }
+        .load-progress { width: 0%; height: 100%; background: linear-gradient(90deg, #06b6d4, #3b82f6); transition: width 0.1s linear; }
+        .load-text { font-family: var(--font-mono); font-size: 11px; color: var(--status-cyan); margin-top: 10px; text-align: center; }
+
+        #login-screen { position: fixed; top:0; left:0; width:100vw; height:100vh; background:#070a12; z-index:99999; display:flex; justify-content:center; align-items:center; padding: 20px; }
+        .login-box { background: var(--bg-card); border: 1px solid var(--border-gray); padding: 30px; border-radius: 12px; width: 100%; max-width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center; }
+
+        /* ================= 響應式佈局主架構 ================= */
+        .sidebar { width: 260px; height: 100%; background: var(--bg-sidebar); border-right: 1px solid var(--border-gray); display: flex; flex-direction: column; transition: transform 0.3s ease; z-index: 999; }
+        .brand { padding: 20px 24px; border-bottom: 1px solid var(--border-gray); font-size: 20px; font-weight: 800; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+        .brand span { color: var(--status-cyan); }
+        .close-sidebar-btn { display: none; font-size: 20px; cursor: pointer; color: var(--text-muted); }
+        
+        .nav-stack { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; color: var(--text-main); text-decoration: none; border-radius: 6px; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .nav-item:hover, .nav-item.active { background-color: var(--bg-card); color: #fff; }
+        .nav-item.active { border-left: 3px solid var(--status-cyan); background-color: rgba(6, 182, 212, 0.05); font-weight: 600; }
+        .sidebar-footer { padding: 16px 24px; border-top: 1px solid var(--border-gray); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
+        /* 主工作區 */
+        .viewport { flex: 1; height: 100%; display: flex; flex-direction: column; overflow: hidden; width: 100%; }
+        
+        /* 頂部導航列 */
+        header { height: 65px; border-bottom: 1px solid var(--border-gray); padding: 0 20px; display: flex; align-items: center; justify-content: space-between; background: var(--bg-sidebar); gap: 10px; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .menu-toggle { display: none; font-size: 22px; cursor: pointer; color: #fff; background: none; border: none; }
+        
+        .select-input { background: var(--bg-input); border: 1px solid var(--border-gray); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 12px; outline: none; cursor: pointer; }
+
+        .status-pill { display: flex; align-items: center; gap: 6px; font-size: 12px; background: rgba(16, 185, 129, 0.15); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--status-green); color: var(--status-green); font-weight: 600; white-space: nowrap; }
+        .status-pill.offline { background: rgba(239, 68, 68, 0.15); border-color: var(--status-red); color: var(--status-red); }
+        .status-pill.queue { background: rgba(249, 115, 22, 0.15); border-color: var(--status-orange); color: var(--status-orange); }
+        .status-pill.crash { background: var(--status-red); border-color: #fff; color: #fff; animation: flash 0.4s infinite alternate; }
+
+        @keyframes flash { from { opacity: 1; } to { opacity: 0.3; } }
+
+        .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
+        .btn { padding: 6px 12px; border: none; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; color: #fff; transition: opacity 0.2s; white-space: nowrap; }
+        .btn-start { background-color: var(--status-green); }
+        .btn-stop { background-color: var(--status-red); }
+        .btn-restart { background-color: #475569; }
+        .btn-pay { background: linear-gradient(135deg, #ec4899, #8b5cf6); box-shadow: 0 0 15px rgba(236, 72, 153, 0.4); font-weight: bold; }
+        .btn:hover { opacity: 0.85; }
+
+        /* 面板內容 */
+        .view-panel { flex: 1; padding: 20px; overflow-y: auto; display: none; }
+        .view-panel.active { display: block; }
+
+        /* 網格數據卡片 */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .card { background: var(--bg-card); border: 1px solid var(--border-gray); border-radius: 8px; padding: 16px; position: relative; overflow: hidden; }
+        .card-title { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .card-value { font-size: 18px; font-weight: 700; color: #fff; margin-top: 4px; }
+        .sparkline-track { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,0.02); }
+        .sparkline-fill { height: 100%; background: var(--status-cyan); width: 0%; transition: width 0.4s ease, background-color 0.3s ease; }
+
+        .alert-banner { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 6px; padding: 12px 16px; margin-bottom: 20px; color: #f87171; font-size: 13px; line-height: 1.5; }
+
+        /* 終端控制台 */
+        .terminal-wrapper { background-color: #05070c; border: 1px solid var(--border-gray); border-radius: 8px; height: 65vh; display: flex; flex-direction: column; overflow: hidden; }
+        .log-viewport { flex: 1; padding: 16px; overflow-y: auto; font-family: var(--font-mono); font-size: 12px; line-height: 1.6; color: #e2e8f0; }
+        .log-line { margin-bottom: 4px; word-break: break-all; white-space: pre-wrap; }
+        .log-info { color: #38bdf8; }
+        .log-warn { color: #fbbf24; }
+        .log-error { color: #f87171; }
+        .log-success { color: #4ade80; }
+        
+        .input-dock { display: flex; border-top: 1px solid var(--border-gray); background: #0b0f19; padding: 12px 16px; align-items: center; }
+        .term-input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-family: var(--font-mono); font-size: 12px; }
+
+        /* 彈窗與廣告 */
+        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(5,7,12,0.85); z-index: 9999; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .modal { background: var(--bg-card); border: 1px solid var(--border-gray); width: 100%; max-width: 420px; padding: 24px; border-radius: 12px; text-align: center; }
+        .pop-ad { position: fixed; width: 280px; background: #fff; color: #000; border: 3px solid #ff0055; padding: 12px; z-index: 10050; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .ad-spot { background: #131824; border: 2px dashed var(--border-gray); padding: 20px; border-radius: 6px; text-align: center; margin-top: 20px; cursor: pointer; }
+
+        .toast-container { position: fixed; bottom: 16px; right: 16px; left: 16px; z-index: 10000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+        .toast { background: #1e293b; border-left: 4px solid var(--status-cyan); padding: 12px 16px; border-radius: 4px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.5); font-size: 12px; animation: slideIn 0.3s ease; pointer-events: auto; }
+        @keyframes slideIn { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .player-row { display: flex; justify-content: space-between; align-items: center; background: #1e2538; padding: 12px 16px; border-radius: 6px; margin-bottom: 8px; border: 1px solid var(--border-gray); font-size: 13px; }
+        .sidebar-mask { display: none; position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:998; }
+
+        /* RWD 斷點設定 */
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            .sidebar { position: fixed; transform: translateX(-100%); height: 100vh; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-mask.open { display: block; }
+            .close-sidebar-btn { display: block; }
+            .stats-grid { grid-template-columns: 1fr; }
+            header { padding: 0 12px; }
+            .view-panel { padding: 16px; }
+            .card-value { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-mask" id="side-mask"></div>
+
+    <div id="loading-screen">
+        <div class="logo-glow">AEROFREE<span>.ENGINE</span></div>
+        <div class="load-bar"><div class="load-progress" id="load-progress-fill"></div></div>
+        <div class="load-text" id="load-status-msg">Initializing hypervisor cores...</div>
+    </div>
+
+    <div id="login-screen" class="hidden">
+        <div class="login-box">
+            <h2 style="color:#fff; margin-bottom:8px;" data-i18n="login-title">控制台安全驗證</h2>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:20px;" data-i18n="login-sub">登入以接管 AeroFree 共享節點</p>
+            <input type="text" style="background:var(--bg-input); border:1px solid var(--border-gray); color:#fff; padding:10px; border-radius:6px; font-size:13px; width:100%; margin-bottom:12px;" value="BlueSun_Admin">
+            <input type="password" style="background:var(--bg-input); border:1px solid var(--border-gray); color:#fff; padding:10px; border-radius:6px; font-size:13px; width:100%; margin-bottom:20px;" value="••••••••">
+            <button class="btn btn-start" id="login-trigger-btn" style="width:100%; padding:12px; font-size:13px;" data-i18n="login-btn">接管控制台</button>
+        </div>
+    </div>
+
+    <div id="ram-pay-modal" class="overlay hidden">
+        <div class="modal" style="border: 2px solid #ec4899;">
+            <h3 style="color:var(--status-red); margin-bottom:12px;" data-i18n="ram-alert-title">🚨 節點記憶體 (RAM) 已完全爆滿！</h3>
+            <p style="font-size:13px; color:#fff; line-height:1.5; margin-bottom:16px;" data-i18n="ram-alert-desc">免費共享硬體資源已被嚴重瓜分，額度已不足 0.01%！</p>
+            <div style="background:rgba(0,0,0,0.4); padding:12px; border-radius:6px; margin-bottom:16px; text-align:left; font-family:var(--font-mono); font-size:12px;">
+                <span style="color:var(--status-red)">[CRITICAL_ERR] OutOfMemoryException</span><br>
+                <span data-i18n="ram-modal-info">規格：免費小水管方案<br>推薦：10TB 企業神級方案</span>
+            </div>
+            <div class="btn-group" style="justify-content:center; gap:8px;">
+                <button class="btn btn-pay" id="modal-upgrade-btn" data-i18n="upgrade-btn">升級 10TB 方案</button>
+                <button class="btn btn-restart" id="modal-ignore-btn" data-i18n="ignore-btn">勉強硬撐</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="queue-modal" class="overlay hidden">
+        <div class="modal">
+            <h3 style="color:var(--status-orange); margin-bottom:12px;" data-i18n="queue-title">⏳ 全服爆滿！啟期突發排隊機制</h3>
+            <p style="font-size:12px; color:var(--text-muted);" data-i18n="queue-desc">當前連線請求突破核心上限，正在分流中...</p>
+            <div style="font-size:36px; font-weight:900; color:#fff; margin:16px 0;"># <span id="queue-pos">3105</span></div>
+        </div>
+    </div>
+
+    <div id="popup-ad" class="pop-ad hidden">
+        <div class="flex justify-between" style="border-bottom:1px solid #ddd; margin-bottom:6px; padding-bottom:4px;">
+            <b style="font-size:11px; color:red;">🔥 絕世好康特別推薦</b>
+            <span style="cursor:pointer; font-weight:bold; font-size:14px;" id="close-ad-btn">×</span>
+        </div>
+        <div style="font-size:11px; line-height:1.4; color:#333;">
+            <b>【修仙手遊】開局送 999 抽！</b><br>一鍵安裝制霸全服！免費主機熱情贊助。
+        </div>
+        <button class="btn btn-pay" id="click-ad-btn" style="width:100%; margin-top:6px; font-size:11px; padding:2px;">立即下載</button>
+    </div>
+
+    <div class="toast-container" id="toast-dock"></div>
+
+    <aside class="sidebar" id="main-sidebar">
+        <div class="brand">
+            <div>AeroFree<span>.Host</span></div>
+            <div class="close-sidebar-btn" id="close-sidebar">×</div>
+        </div>
+        <div style="padding: 12px 16px;">
+            <select class="select-input" id="game-node-selector" style="width:100%;">
+                <option value="minecraft">🟢 Minecraft - Paper 1.21</option>
+                <option value="lol">⚪ League of Legends (LOL)</option>
+                <option value="roblox">⚪ Roblox Sandbox</option>
+                <option value="cs2">⚪ Counter-Strike 2</option>
+                <option value="brawl">⚪ Brawl Stars 私服</option>
+            </select>
+        </div>
+        <nav class="nav-stack">
+            <div class="nav-item active" data-target="p-dash" data-i18n="nav-dash">首頁 (Server)</div>
+            <div class="nav-item" data-target="p-opts" data-i18n="nav-opts">選項 (Options)</div>
+            <div class="nav-item" data-target="p-console" data-i18n="nav-console">主控台 (Console)</div>
+            <div class="nav-item" data-target="p-players" data-i18n="nav-players">玩家 (Players)</div>
+            <div class="nav-item" data-target="p-donate" style="color:var(--status-cyan); font-weight:bold;" data-i18n="nav-donate">💎 斗內升級</div>
+        </nav>
+        <div class="sidebar-footer">
+            <div id="current-plan" data-i18n="plan-free">方案：💡 承諾永久免費</div>
+            <div data-i18n="arch-info">架構：2026 跨端虛擬化</div>
+        </div>
+    </aside>
+
+    <main class="viewport">
+        <header>
+            <div class="header-left">
+                <button class="menu-toggle" id="open-sidebar">☴</button>
+                <h3 style="font-size:14px; font-weight:700;" id="panel-title" data-i18n="nav-dash">首頁 (Server)</h3>
+            </div>
+            <div class="flex align-center" style="gap:10px;">
+                <select class="select-input" id="lang-selector">
+                    <option value="zh">繁體中文</option>
+                    <option value="en">English</option>
+                    <option value="ja">日本語</option>
+                </select>
+                <div class="status-pill" id="status-tag" data-i18n="status-online">● 在線</div>
+                <div class="btn-group">
+                    <button class="btn btn-start" id="ctrl-start" data-i18n="btn-start">啟動</button>
+                    <button class="btn btn-stop" id="ctrl-stop" data-i18n="btn-stop">關閉</button>
+                    <button class="btn btn-restart" id="ctrl-restart" data-i18n="btn-restart">重啟</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="view-panel active" id="p-dash">
+            <div class="alert-banner" id="dash-alert" data-i18n="alert-msg">
+                <b>⚠️ 資源限制：</b>當伺服器內完全沒有玩家在線時，系統將自動關機以釋放節點。
+            </div>
+            <div class="stats-grid">
+                <div class="card">
+                    <div class="card-title" data-i18n="card-tps">主機心跳 (TPS)</div>
+                    <div class="card-value" id="val-tps">20.0</div>
+                    <div class="sparkline-track"><div class="sparkline-fill" id="fill-tps" style="width:100%;"></div></div>
+                </div>
+                <div class="card">
+                    <div class="card-title" data-i18n="card-ram">動態記憶體 (RAM)</div>
+                    <div class="card-value" id="val-ram">4.1 GB / 16.0 GB</div>
+                    <div class="sparkline-track"><div class="sparkline-fill" id="fill-ram" style="width:25%;"></div></div>
+                </div>
+                <div class="card">
+                    <div class="card-title" data-i18n="card-cpu">處理器負載 (CPU)</div>
+                    <div class="card-value" id="val-cpu">14.5 %</div>
+                    <div class="sparkline-track"><div class="sparkline-fill" id="fill-cpu" style="width:14%;"></div></div>
+                </div>
+                <div class="card">
+                    <div class="card-title" data-i18n="card-slots">在線人數 (Slots)</div>
+                    <div class="card-value" id="val-slots">125 / 999999</div>
+                    <div class="sparkline-track"><div class="sparkline-fill" id="fill-slots" style="width:15%;"></div></div>
+                </div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 6px; border: 1px dashed var(--border-gray); margin-bottom:16px;">
+                <span style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:6px;" data-i18n="sandbox-title">🛠️ 2026 模擬測試器 (手機端也支援點擊測試)：</span>
+                <div class="btn-group">
+                    <button class="btn btn-stop" id="test-queue-btn" style="font-size:11px; padding:4px 8px;">⚡ 排隊海嘯</button>
+                    <button class="btn btn-pay" id="test-ram-btn" style="font-size:11px; padding:4px 8px;">🔥 RAM爆滿</button>
+                    <button class="btn btn-restart" id="test-crash-btn" style="font-size:11px; padding:4px 8px; background:#b45309;">💥 炸服重啟</button>
+                </div>
+            </div>
+
+            <div class="ad-spot" id="banner-ad-spot">
+                <div style="color:var(--status-cyan); font-weight:bold; font-size:13px;" data-i18n="ad-text">✨ 【隨便點擊贊助商廣告】可免去排隊等待！ ✨</div>
+            </div>
+        </div>
+
+        <div class="view-panel" id="p-opts">
+            <h3 style="margin-bottom:16px;" data-i18n="nav-opts">選項設定</h3>
+            <div class="player-row">
+                <div><b data-i18n="opt-cracked">非官方盜版驗證 (Cracked)</b></div>
+                <span style="color:var(--status-green); font-weight:bold;">ON</span>
+            </div>
+            <div class="player-row">
+                <div><b data-i18n="opt-anticheat">自動防禦型防作弊 Ban 人系統</b></div>
+                <span style="color:var(--status-green); font-weight:bold;">ON</span>
+            </div>
+        </div>
+
+        <div class="view-panel" id="p-console" style="padding:10px;">
+            <div class="terminal-wrapper">
+                <div class="log-viewport" id="console-logs"></div>
+                <div class="input-dock">
+                    <span style="font-family:var(--font-mono); color:var(--status-cyan); margin-right:8px; font-weight:bold; font-size:12px;">#</span>
+                    <input type="text" class="term-input" id="console-input" placeholder="Type server command here...">
+                </div>
+            </div>
+        </div>
+
+        <div class="view-panel" id="p-players">
+            <h3 style="margin-bottom:16px;" data-i18n="nav-players">線上玩家控制</h3>
+            <div class="player-row"><div><b>Steve</b></div><button class="btn btn-stop">Kick</button></div>
+            <div class="player-row"><div><b>Alex</b></div><button class="btn btn-stop">Kick</button></div>
+            <div class="player-row"><div><b>BlueSun</b></div><button class="btn btn-stop">Kick</button></div>
+        </div>
+
+        <div class="view-panel" id="p-donate">
+            <h3 style="margin-bottom:12px; color:var(--status-cyan);" data-i18n="donate-title">💎 2026 終極贊助金流儲值</h3>
+            <div style="background:var(--bg-card); border:1px solid #ff007c; padding:20px; border-radius:12px; text-align:center;">
+                <h4 style="color:#fff;" data-i18n="donate-plan">🚀 頂級企業神級方案 (10TB 大容量)</h4>
+                <div style="font-size:28px; font-weight:900; color:#fff; margin:12px 0;">$ 9.99 <span style="font-size:12px; color:var(--text-muted);">/ mo</span></div>
+                <button class="btn btn-pay" id="page-upgrade-btn" style="width:100%; padding:10px;" data-i18n="upgrade-btn">立即付費升級 10TB</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const i18nTokens = {
+            zh: {
+                "login-title": "控制台安全驗證", "login-sub": "登入以接管 AeroFree 共享節點", "login-btn": "接管控制台",
+                "nav-dash": "首頁 (Server)", "nav-opts": "選項 (Options)", "nav-console": "主控台 (Console)", "nav-players": "玩家 (Players)", "nav-donate": "💎 斗內升級",
+                "plan-free": "方案：💡 承諾永久免費", "arch-info": "架構：2026 跨端虛擬化", "status-online": "● 在線",
+                "btn-start": "啟動", "btn-stop": "關閉", "btn-restart": "重啟", "card-tps": "主機心跳 (TPS)",
+                "card-ram": "動態記憶體 (RAM)", "card-cpu": "處理器負載 (CPU)", "card-slots": "在線人數 (Slots)",
+                "alert-msg": "⚠️ 資源限制：當伺服器內完全沒有玩家在線時，系統將自動關機以釋放節點。",
+                "sandbox-title": "🛠️ 2026 模擬測試器 (手機端也支援點擊測試)：", "ad-text": "✨ 【隨便點擊贊助商廣告】可免去排隊等待！ ✨",
+                "opt-cracked": "非官方盜版驗證 (Cracked)", "opt-anticheat": "自動防禦型防作弊 Ban 人系統",
+                "donate-title": "💎 2026 終極贊助金流儲值", "donate-plan": "🚀 頂級企業神級方案 (10TB 大容量)",
+                "upgrade-btn": "立即付費升級 10TB", "ram-alert-title": "🚨 節點記憶體 (RAM) 已完全爆滿！",
+                "ram-alert-desc": "免費共享硬體資源已被嚴重瓜分，額度已不足 0.01%！", "ignore-btn": "勉強硬撐",
+                "queue-title": "⏳ 全服爆滿！啟動突發排隊機制", "queue-desc": "當前連線請求突破核心上限，正在分流中..."
+            },
+            en: {
+                "login-title": "Console Authentication", "login-sub": "Login to claim your AeroFree node shared environment", "login-btn": "Access Console",
+                "nav-dash": "Dashboard", "nav-opts": "Options", "nav-console": "Console", "nav-players": "Players", "nav-donate": "💎 Premium Upgrade",
+                "plan-free": "Plan: 💡 Forever Free Tier", "arch-info": "Arch: 2026 Multi-Platform v4", "status-online": "● Online",
+                "btn-start": "Start", "btn-stop": "Stop", "btn-restart": "Restart", "card-tps": "Tickrate (TPS)",
+                "card-ram": "Memory (RAM Allocation)", "card-cpu": "Processor Load (CPU)", "card-slots": "Players Online",
+                "alert-msg": "⚠️ Resource Cap: Host container automatically suspends if zero player activity detected.",
+                "sandbox-title": "🛠️ Simulated Sandbox Event Engines (Tap to fire):", "ad-text": "✨ [Click Sponsor Ads] to skip all traffic dynamic queues instantly! ✨",
+                "opt-cracked": "Bypass Authentication (Cracked/Offline Client)", "opt-anticheat": "Heuristic Behavioral Auto-Ban Defensive Matrix",
+                "donate-title": "💎 2026 Core Funding Gateways", "donate-plan": "🚀 Enterprise Overlord Plan (10TB Extreme SSD)",
+                "upgrade-btn": "Provision 10TB Instance Now", "ram-alert-title": "🚨 Node Resource Allocation Exhausted!",
+                "ram-alert-desc": "Free tier hardware pool oversubscribed, headroom under 0.01%!", "ignore-btn": "Keep Starving",
+                "queue-title": "⏳ Traffic Spike! Entering Dynamic Lineup Queues", "queue-desc": "Inbound handshake limits peaked. Holding socket open..."
+            },
+            ja: {
+                "login-title": "コンソール安全認証", "login-sub": "AeroFree 無料共有ノードを制御するためにログイン", "login-btn": "サーバーに接続",
+                "nav-dash": "ダッシュボード", "nav-opts": "設定オプション", "nav-console": "コンソール", "nav-players": "プレイヤー", "nav-donate": "💎 10TB アップグレード",
+                "plan-free": "プラン：💡 永久無料を約束", "arch-info": "構造：2026 仮想化コンテナ", "status-online": "● オンライン",
+                "btn-start": "起動", "btn-stop": "停止", "btn-restart": "再起動", "card-tps": "ハートビート (TPS)",
+                "card-ram": "動的メモリ (RAM)", "card-cpu": "プロセッサ負荷 (CPU)", "card-slots": "接続人数 (Slots)",
+                "alert-msg": "⚠️ リソース制限：プレイヤーがいない場合、共有ハードウェアを解放するため自動的にシャットダウンします。",
+                "sandbox-title": "🛠️ イベントシミュレーター (モバイルクリック対応)：", "ad-text": "✨ 【スポンサー広告をクリック】すると、待機列をスキップできます！ ✨",
+                "opt-cracked": "非公式クラック版接続認証 (Cracked)", "opt-anticheat": "アンチチート自動 BAN 防御システム",
+                "donate-title": "💎 2026 究極スポンサー決済", "donate-plan": "🚀 プレミアム企業神プラン (10TB 大容量)",
+                "upgrade-btn": "今すぐ 10TB へアップグレード", "ram-alert-title": "🚨 メモリ (RAM) が完全に枯渇しました！",
+                "ram-alert-desc": "無料プランのハードウェア枠が限界に達しました。残容量 0.01% 未満！", "ignore-btn": "このまま耐える",
+                "queue-title": "⏳ 接続爆発！緊急アクセス待機列起動", "queue-desc": "トラフィックがコア上限を超えました。待機中..."
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // ================= 全域狀態變數 =================
+            let isRunning = true;
+            let isEmergencyQueue = false;
+            let isRamExploded = false; // 用來鎖定 RAM 爆滿狀態，防止被定時器蓋過去
+            let currentGame = 'minecraft';
+            let isPremium = false;
+            let currentLang = 'zh';
+
+            const logsViewport = document.getElementById('console-logs');
+            const sidebar = document.getElementById('main-sidebar');
+            const sideMask = document.getElementById('side-mask');
+
+            // ================= 語言翻譯引擎 =================
+            function applyTranslations(lang) {
+                currentLang = lang;
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const token = el.getAttribute('data-i18n');
+                    if (i18nTokens[lang][token]) {
+                        if (el.tagName === 'INPUT') el.placeholder = i18nTokens[lang][token];
+                        else el.innerHTML = i18nTokens[lang][token];
+                    }
+                });
+            }
+            document.getElementById('lang-selector').addEventListener('change', (e) => applyTranslations(e.target.value));
+
+            // ================= 手機端抽屜菜單控制 =================
+            document.getElementById('open-sidebar').addEventListener('click', () => { sidebar.classList.add('open'); sideMask.classList.add('open'); });
+            const closeSidebar = () => { sidebar.classList.remove('open'); sideMask.classList.remove('open'); };
+            document.getElementById('close-sidebar').addEventListener('click', closeSidebar);
+            sideMask.addEventListener('click', closeSidebar);
+
+            // ================= 開場加載與登入流程 =================
+            const fill = document.getElementById('load-progress-fill');
+            let progress = 0;
+            let loadInterval = setInterval(() => {
+                progress += Math.floor(Math.random() * 6) + 3;
+                if(progress >= 100) {
+                    clearInterval(loadInterval);
+                    document.getElementById('loading-screen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loading-screen').remove();
+                        document.getElementById('login-screen').classList.remove('hidden');
+                    }, 600);
+                }
+                fill.style.width = progress + '%';
+            }, 50);
+
+            // 登入事件接管
+            document.getElementById('login-trigger-btn').addEventListener('click', () => {
+                document.getElementById('login-screen').remove();
+                appendConsoleLog("Handshake authentication secure. Host container linked successfully.", 'success');
+                playBootSequence();
+            });
+
+            // 跨頁面選單點擊切換
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    if(!isPremium && Math.random() < 0.2) triggerPopupAd(); 
+                    closeSidebar();
+                    navItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+                    
+                    const targetPanel = document.getElementById(item.getAttribute('data-target'));
+                    targetPanel.classList.add('active');
+                    document.getElementById('panel-title').innerText = item.innerText;
+                });
+            });
+
+            // ================= 虛擬開機調度歷程 =================
+            function playBootSequence() {
+                isRunning = false;
+                document.getElementById('status-tag').className = "status-pill queue";
+                document.getElementById('status-tag').innerText = "⏳ Booting...";
+
+                appendConsoleLog(`[AeroFree] Allocating dynamic thread slots for ${currentGame.toUpperCase()}...`, 'info');
+                setTimeout(() => appendConsoleLog(`[Daemon] Pulling container images from central registry...`, 'info'), 1500);
+                setTimeout(() => appendConsoleLog(`[Hardware] Mounting virtual high-speed block storage vDisk...`, 'info'), 3500);
+                
+                setTimeout(() => {
+                    if (currentGame === 'minecraft') {
+                        appendConsoleLog("Loading Paper 1.21.10 Engine...", 'info');
+                        setTimeout(() => appendConsoleLog("Preparing chunk level data 'world_nether'...", 'info'), 1200);
+                        setTimeout(() => finishBoot(), 2500);
+                    } else {
+                        appendConsoleLog(`Bootstrapping core architecture for ${currentGame.toUpperCase()}...`, 'info');
+                        setTimeout(() => finishBoot(), 2000);
+                    }
+                }, 5000);
+            }
+
+            function finishBoot() {
+                isRunning = true;
+                appendConsoleLog("Done (11.45s)! Application listening on interface 0.0.0.0. Ready.", 'success');
+                document.getElementById('status-tag').className = "status-pill";
+                document.getElementById('status-tag').innerText = currentLang === 'zh' ? '● 在線' : (currentLang === 'en' ? '● Online' : '● オンライン');
+            }
+
+            // ================= 💥 核心功能與測試引擎 =================
+            
+            // 1. 排隊海嘯
+            function runQueueTsunami() {
+                if(!isRunning || isPremium) return;
+                isEmergencyQueue = true;
+                appendConsoleLog("[Anti-DDOS] Active packet storm detected! Forcing core line queuesup.", 'warn');
+                document.getElementById('queue-modal').classList.remove('hidden');
+                
+                let count = Math.floor(Math.random() * 2000) + 1000;
+                document.getElementById('queue-pos').innerText = count;
+                
+                let qInterval = setInterval(() => {
+                    count -= Math.floor(Math.random() * 120) + 50;
+                    if(count <= 0) {
+                        clearInterval(qInterval);
+                        document.getElementById('queue-modal').classList.add('hidden');
+                        isEmergencyQueue = false;
+                        appendConsoleLog("[System] Line queue cleared. Core allocation normalized.", 'success');
+                    } else {
+                        document.getElementById('queue-pos').innerText = count;
+                    }
+                }, 300);
+            }
+
+            // 2. RAM 爆滿
+            function runRamExplosion() {
+                if(!isRunning || isPremium) return;
+                isRamExploded = true; // 鎖定狀態
+                document.getElementById('val-ram').innerText = "15.99 GB / 16.0 GB";
+                document.getElementById('fill-ram').style.width = "100%";
+                document.getElementById('fill-ram').style.backgroundColor = "var(--status-red)";
+                
+                appendConsoleLog("[CRITICAL] Host OS reached thermal out-of-memory threshold!", 'error');
+                document.getElementById('ram-pay-modal').classList.remove('hidden');
+            }
+
+            // 3. 炸服重啟
+            function runServerCrash() {
+                if(!isRunning) return;
+                isRunning = false;
+                
+                // 炸服時瞬間清空儀表板數據，更有真實感
+                document.getElementById('val-tps').innerText = "0.0";
+                document.getElementById('fill-tps').style.width = "0%";
+                document.getElementById('val-cpu').innerText = "0.0 %";
+                document.getElementById('fill-cpu').style.width = "0%";
+                
+                document.getElementById('status-tag').className = "status-pill crash";
+                document.getElementById('status-tag').innerText = "💥 CRASHED";
+                
+                showToast("🚨 核心崩潰中 / Server Crashed!", "伺服器已被熊孩子搞崩！主機正在傾印日誌並嘗試在線重啟守護防護...");
+                appendConsoleLog("[Error] java.lang.NullPointerException: Server entity ticking loop halted violently!", 'error');
+                appendConsoleLog("[Daemon] Standby... Catching exception threads and triggering automatic reboot scripts...", 'warn');
+                
+                setTimeout(() => { playBootSequence(); }, 3000);
+            }
+
+            // 精準註冊三個測試按鈕點擊事件
+            document.getElementById('test-queue-btn').addEventListener('click', (e) => { e.preventDefault(); runQueueTsunami(); });
+            document.getElementById('test-ram-btn').addEventListener('click', (e) => { e.preventDefault(); runRamExplosion(); });
+            document.getElementById('test-crash-btn').addEventListener('click', (e) => { e.preventDefault(); runServerCrash(); });
+
+            // ================= 💎 數據實時跳動核心監控迴圈 (已修復凍結 Bug) =================
+            setInterval(() => {
+                // 如果是伺服器炸裂崩潰或正在重啟中，就先不要亂跳數據
+                if (!isRunning) return;
+
+                // 1. TPS 跳動 (在線時接近 20)
+                let tps = (19.6 + Math.random() * 0.4).toFixed(1);
+                document.getElementById('val-tps').innerText = tps;
+                document.getElementById('fill-tps').style.width = (tps / 20 * 100) + "%";
+
+                // 2. CPU 跳動
+                let cpu = (12.0 + Math.random() * 18.5).toFixed(1);
+                document.getElementById('val-cpu').innerText = cpu + " %";
+                document.getElementById('fill-cpu').style.width = cpu + "%";
+
+                // 3. RAM 跳動 (如果正在觸發 RAM爆滿 測試，就鎖定在 15.99GB，否則正常微幅起伏)
+                if (!isRamExploded) {
+                    if (!isPremium) {
+                        let ram = (3.8 + Math.random() * 0.7).toFixed(1);
+                        document.getElementById('val-ram').innerText = ram + " GB / 16.0 GB";
+                        document.getElementById('fill-ram').style.width = (ram / 16 * 100) + "%";
+                        document.getElementById('fill-ram').style.backgroundColor = "var(--status-cyan)";
+                    } else {
+                        // 升級 10TB 之後的專屬超大空間跳動
+                        let ram = (4.0 + Math.random() * 1.2).toFixed(1);
+                        document.getElementById('val-ram').innerText = ram + " GB / 10240.0 GB";
+                        document.getElementById('fill-ram').style.width = "1%";
+                    }
+                }
+            }, 1200); // 每 1.2 秒刷新一次，絕對有在動！
+
+
+            // ================= 彈窗與付費解鎖互動 =================
+            function simulateDonateSuccess() {
+                isPremium = true;
+                isRamExploded = false; // 解除鎖定
+                document.getElementById('ram-pay-modal').classList.add('hidden');
+                document.getElementById('current-plan').innerText = currentLang === 'zh' ? "方案：💎 頂級企業 10TB" : "Plan: 💎 Ultra 10TB Enterprise";
+                document.getElementById('current-plan').style.color = "var(--status-cyan)";
+                document.getElementById('val-ram').innerText = "4.1 GB / 10240.0 GB";
+                document.getElementById('fill-ram').style.width = "1%";
+                document.getElementById('fill-ram').style.backgroundColor = "var(--status-cyan)";
+                appendConsoleLog("[Billing] Transaction verified! Provisioned premium 10TB dedicated block.", 'success');
+                showToast("💰 贊助完成 / Payment Verified", "已成功解除限制，全站無廣告，資源無上限！");
+            }
+
+            document.getElementById('modal-ignore-btn').addEventListener('click', () => {
+                isRamExploded = false; // 點擊勉強硬撐後解除鎖定，讓數據恢復跳動
+                document.getElementById('ram-pay-modal').classList.add('hidden'); 
+            });
+
+            document.getElementById('modal-upgrade-btn').addEventListener('click', simulateDonateSuccess);
+            document.getElementById('page-upgrade-btn').addEventListener('click', simulateDonateSuccess);
+
+            // ================= 自動防禦 Ban 人系統 =================
+            function autoBanSystem() {
+                if(!isRunning || isEmergencyQueue) return;
+                const suspects = ['Gamer_FlyX', 'SpeedyBoy99', 'OpVanish_User', 'Nuker_Bot'];
+                const target = suspects[Math.floor(Math.random() * suspects.length)];
+                appendConsoleLog(`[Anti-Cheat] Anomalous velocity hash signatures checked from ${target}`, 'warn');
+                setTimeout(() => {
+                    appendConsoleLog(`[Console] Security defensive firewall issued ban instruction on: ${target}`, 'error');
+                    showToast("🔨 系統防禦懲處通知 / Auto-Ban System", `不法玩家 <b>${target}</b> 因嘗試注入異常封包，已遭系統自動永久封鎖！`);
+                }, 1000);
+            }
+            setInterval(() => { if(Math.random() > 0.7) autoBanSystem(); }, 25000);
+
+            // ================= 廣告處理 =================
+            function triggerPopupAd() {
+                const ad = document.getElementById('popup-ad');
+                ad.style.top = Math.floor(Math.random() * 40 + 20) + '%';
+                ad.style.left = Math.floor(Math.random() * 40 + 20) + '%';
+                ad.classList.remove('hidden');
+            }
+            document.getElementById('close-ad-btn').addEventListener('click', () => document.getElementById('popup-ad').classList.add('hidden'));
+            document.getElementById('click-ad-btn').addEventListener('click', () => { document.getElementById('popup-ad').classList.add('hidden'); });
+            document.getElementById('banner-ad-spot').addEventListener('click', () => { alert("感謝點擊贊助商廣告支援！"); if(!isPremium) triggerPopupAd(); });
+
+            function showToast(title, msg) {
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.innerHTML = `<div style="font-weight:bold; margin-bottom:2px;">${title}</div><div>${msg}</div>`;
+                document.getElementById('toast-dock').appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
+            }
+
+            function appendConsoleLog(text, level = 'info') {
+                const line = document.createElement('div');
+                line.className = 'log-line';
+                const time = new Date().toLocaleTimeString([], { hour12: false });
+                line.innerHTML = `<span class="log-${level}">[${time} ${level.toUpperCase()}]: ${text}</span>`;
+                logsViewport.appendChild(line);
+                logsViewport.scrollTop = logsViewport.scrollHeight;
+            }
+
+            // 跨遊戲核心切換
+            document.getElementById('game-node-selector').addEventListener('change', (e) => {
+                currentGame = e.target.value;
+                runServerCrash();
+            });
+
+            // 常規頂部控制按鈕監聽
+            document.getElementById('ctrl-stop').addEventListener('click', () => {
+                isRunning = false;
+                document.getElementById('val-tps').innerText = "0.0";
+                document.getElementById('fill-tps').style.width = "0%";
+                document.getElementById('val-cpu').innerText = "0.0 %";
+                document.getElementById('fill-cpu').style.width = "0%";
+                appendConsoleLog("Stopping virtualization stack gracefully...", 'warn');
+                document.getElementById('status-tag').className = "status-pill offline";
+                document.getElementById('status-tag').innerText = currentLang === 'zh' ? '● 離線' : '● Offline';
+            });
+            document.getElementById('ctrl-restart').addEventListener('click', () => { runServerCrash(); });
+            document.getElementById('ctrl-start').addEventListener('click', () => { if(!isRunning) playBootSequence(); });
+        });
+    </script>
+</body>
+</html>
