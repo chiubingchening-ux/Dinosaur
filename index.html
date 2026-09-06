@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公共 Wi-Fi 認證服務</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background-color: #f5f5f7; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 400px; width: 100%; box-sizing: border-box; }
+        h2 { text-align: center; color: #333; margin-bottom: 20px; }
+        .input-group { margin-bottom: 12px; }
+        .input-group label { display: block; margin-bottom: 8px; color: #444; font-weight: bold; font-size: 15px; }
+        .input-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; box-sizing: border-box; text-align: center; letter-spacing: 2px; }
+        
+        /* 輔助提示文字與超連結樣式 */
+        .help-link-wrapper { text-align: left; margin-bottom: 25px; padding-left: 2px; }
+        .help-link-wrapper a { color: #007aff; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .help-link-wrapper a:hover { text-decoration: underline; }
+
+        .terms-box { height: 200px; overflow-y: scroll; border: 1px solid #ddd; padding: 15px; background: #fafafa; border-radius: 6px; margin-bottom: 20px; font-size: 14px; line-height: 1.6; color: #555; }
+        .btn-container { display: flex; justify-content: flex-end; }
+        .btn { padding: 12px 24px; background-color: #007aff; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold; width: auto; min-width: 100px; text-align: center; }
+        .btn:disabled { background-color: #d1d1d6; cursor: not-allowed; }
+        .full-btn { display: block; width: 100%; padding: 12px; background-color: #34c759; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; text-align: center; font-weight: bold; }
+        .full-btn:disabled { background-color: #d1d1d6; cursor: not-allowed; }
+        #terms-section { display: none; }
+        .notice { color: #ff3b30; font-size: 13px; text-align: center; margin-bottom: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Wi-Fi 網路連線服務</h2>
+    
+    <!-- 第一階段：輸入優惠碼與不知道金鑰連結 -->
+    <div id="input-section">
+        <div class="input-group">
+            <label for="voucherCode">請輸入您的上網優惠碼：</label>
+            <input type="text" id="voucherCode" placeholder="請輸入 5 位數專屬代碼" maxlength="5" required>
+        </div>
+        
+        <!-- 新增：不知道金鑰的點擊提示連結 -->
+        <div class="help-link-wrapper">
+            <a href="https://chiubingchening-ux.github.io/Dinosaur/key.csv" target="_blank">不知道金鑰嗎？點我</a>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn" type="button" onclick="goToTermsSection()">下一步</button>
+        </div>
+    </div>
+
+    <!-- 第二階段：服務條款（仿 iTaiwan 流程，點擊下一步後才跑出來） -->
+    <div id="terms-section">
+        <div class="notice">⚠️ 請將條款滑動至最底部以解鎖同意按鈕</div>
+        <div class="terms-box" id="termsBox">
+            <strong>【Wi-Fi 上網服務條款與隱私權政策】</strong><br><br>
+            1. 本網路服務由本站免費提供。為維護整體網路安全與頻寬順暢，不保證連線速度，如有斷線或連線不穩定之情形，本站概不負責。<br><br>
+            2. 使用者嚴禁利用本公用網路從事任何非法行為，包括但不限於網路詐欺、駭客攻擊、惡意散布病毒、色情或侵犯他人著作權與隱私等活動。違者須自行承擔一切法律責任。<br><br>
+            3. 連線期間本系統後台會依法自動記錄網址請求、上網時間與流量日誌，僅供內部資訊安全審查與應對法規調閱要求，不會用於商業用途。<br><br>
+            4. 請妥善保管您的上網代碼，每組優惠碼均有使用期限，逾期、流量耗盡或中斷重連後可能需重新驗證。<br><br>
+            （您已成功閱讀至服務條款最底部，感謝您的配合與遵守。）
+        </div>
+        <button class="full-btn" id="agreeBtn" disabled onclick="submitToRouter()">我已閱讀並同意上述條款</button>
+    </div>
+</div>
+
+<script>
+    let savedCode = "";
+    const termsBox = document.getElementById('termsBox');
+    const agreeBtn = document.getElementById('agreeBtn');
+
+    // 內建您提供的 100 組專屬合法優惠碼資料庫
+    const validCodes = [
+        "82351", "84271", "66010", "35808", "17937", "50200", "12956", "20490", "24106", "38721",
+        "83345", "97051", "91676", "98159", "54725", "93680", "24701", "21005", "93737", "97338",
+        "55875", "12450", "20095", "15227", "25013", "06142", "73242", "86616", "90322", "10491",
+        "95350", "30974", "50750", "02406", "16021", "45191", "03017", "19874", "90903", "24992",
+        "10485", "24091", "01291", "13238", "90438", "76396", "41355", "84627", "02432", "99721",
+        "19938", "58471", "17445", "91422", "47993", "26050", "20662", "39727", "32088", "18557",
+        "11817", "30983", "55829", "54360", "89207", "25778", "95552", "55326", "53767", "27743",
+        "38487", "37928", "87319", "51395", "78110", "38984", "11870", "71644", "83388", "47992",
+        "45422", "88501", "79610", "99486", "96486", "95627", "52909", "72216", "72163", "22678",
+        "36283", "79656", "31301", "13331", "03743", "77740", "68153", "58566", "31846", "71426"
+    ];
+
+    function goToTermsSection() {
+        const codeInput = document.getElementById('voucherCode').value.trim();
+        
+        if (!codeInput) {
+            alert('請先輸入上網優惠碼！');
+            return;
+        }
+        
+        if (!validCodes.includes(codeInput)) {
+            alert('❌ 錯誤的優惠碼，請重新輸入有效的 5 位數代碼！');
+            return;
+        }
+        
+        savedCode = codeInput;
+        document.getElementById('input-section').style.display = 'none';
+        document.getElementById('terms-section').style.display = 'block';
+    }
+
+    termsBox.addEventListener('scroll', function() {
+        if (termsBox.scrollHeight - termsBox.scrollTop <= termsBox.clientHeight + 5) {
+            agreeBtn.disabled = false;
+        }
+    });
+
+    function submitToRouter() {
+        if (!savedCode) {
+            alert('代碼遺失，請重新整理頁面。');
+            return;
+        }
+        
+        if (typeof mypublicwifi !== 'undefined' && mypublicwifi.login) {
+            mypublicwifi.login(savedCode);
+        } else {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '#';
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'mpw_voucher';
+            input.value = savedCode;
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+            alert('驗證成功！服務條款已同意，正在為您開啟網路，請稍候...');
+        }
+    }
+</script>
+
+</body>
+</html>
+
